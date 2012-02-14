@@ -8,7 +8,7 @@
 class nokogiri implements IteratorAggregate{
 	const
 	regexp = 
-	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>\S+)\])?(#(?P<id>\S+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child(\([^\)]+)\))))?\s*(?P<rel>>)?/isS"
+	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\)))?\s*(?P<rel>>)?/isS"
 	;
 	protected $_source = '';
 	/**
@@ -101,10 +101,7 @@ class nokogiri implements IteratorAggregate{
 	}
 	public function getXpathSubquery($expression, $rel = false){
 		$query = '';
-		if (preg_match($this->getRegexp(), $expression, $subs)){
-			$tag = isset($subs['tag']) && !empty($subs['tag'])?$subs['tag']:'*';
-			$query = ($rel?'/':'//').$tag;
-			//var_dump($subs);
+		if (preg_match(self::regexp, $expression, $subs)){
 			$brackets = array();
 			if (isset($subs['id']) && '' !== $subs['id']){
 				$brackets[] = "@id='".$subs['id']."'";
@@ -138,13 +135,12 @@ class nokogiri implements IteratorAggregate{
 					}
 				}
 			}
-			if ($c = count($brackets)){
-				if ($c > 1){
-					$query .= '[('.implode(') and (', $brackets).')]';
-				}else{
-					$query .= '['.implode(' and ', $brackets).']';
-				}
-			}
+			$query = ($rel?'/':'//').
+				((isset($subs['tag']) && '' !== $subs['tag'])?$subs['tag']:'*').
+				(($c = count($brackets))?
+					($c>1?'[('.implode(') and (', $brackets).')]':'['.implode(' and ', $brackets).']')
+				:'')
+				;
 			$left = trim(substr($expression, strlen($subs[0])));
 			if ('' !== $left){
 				$query .= $this->getXpathSubquery($left, '>'===$subs['rel']);
