@@ -106,17 +106,17 @@ class nokogiri implements IteratorAggregate{
 			$query = ($rel?'/':'//').$tag;
 			//var_dump($subs);
 			$brackets = array();
-			if ('' !== $subs['id']){
+			if (isset($subs['id']) && '' !== $subs['id']){
 				$brackets[] = "@id='".$subs['id']."'";
 			}
-			if ('' !== $subs['attr']){
+			if (isset($subs['attr']) && '' !== $subs['attr']){
 				$attrValue = isset($subs['value']) && !empty($subs['value'])?$subs['value']:'';
 				$brackets[] = "@".$subs['attr']."='".$attrValue."'";
 			}
 			if (isset($subs['class']) && '' !== $subs['class']){
 				$brackets[] = 'contains(concat(" ", normalize-space(@class), " "), " '.$subs['class'].' ")';
 			}
-			if ('' !== $subs['pseudo']){
+			if (isset($subs['pseudo']) && '' !== $subs['pseudo']){
 				if ('first-child' === $subs['pseudo']){
 					$brackets[] = '1';
 				}elseif ('last-child' === $subs['pseudo']){
