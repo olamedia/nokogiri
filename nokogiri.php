@@ -23,7 +23,7 @@ class nokogiri implements IteratorAggregate{
 	 * @var DOMXpath
 	 * */
 	protected $_xpath = null;
-	protected $_compiledXpath = array();
+	protected static $_compiledXpath = array();
 	public function __construct($htmlString = ''){
 		$this->loadHtml($htmlString);
 	}
@@ -65,7 +65,7 @@ class nokogiri implements IteratorAggregate{
 	function __invoke($expression){
 		return $this->get($expression);
 	}
-	public function get($expression){
+	public function get($expression, $compile = true){
 		/*if (strpos($expression, ' ') !== false){
 			$a = explode(' ', $expression);
 			foreach ($a as $k=>$sub){
@@ -73,7 +73,7 @@ class nokogiri implements IteratorAggregate{
 			}
 			return $this->getElements(implode('', $a));
 		}*/
-		return $this->getElements($this->getXpathSubquery($expression));
+		return $this->getElements($this->getXpathSubquery($expression, false, $compile));
 	}
 	protected function getNodes(){
 
@@ -103,8 +103,8 @@ class nokogiri implements IteratorAggregate{
 	public function getXpathSubquery($expression, $rel = false, $compile = true){
 		if ($compile){
 			$key = $expression.($rel?'>':'*');
-			if (isset($this->_compiledXpath[$key])){
-				return $this->_compiledXpath[$key];
+			if (isset(self::$_compiledXpath[$key])){
+				return self::$_compiledXpath[$key];
 			}
 		}
 		$query = '';
@@ -154,7 +154,7 @@ class nokogiri implements IteratorAggregate{
 			}
 		}
 		if ($compile){
-			$this->_compiledXpath[$key] = $query;
+			self::$_compiledXpath[$key] = $query;
 		}
 		return $query;
 	}
