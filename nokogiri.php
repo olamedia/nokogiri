@@ -23,6 +23,7 @@ class nokogiri implements IteratorAggregate{
 	 * @var DOMXpath
 	 * */
 	protected $_xpath = null;
+	protected $_compiledXpath = array();
 	public function __construct($htmlString = ''){
 		$this->loadHtml($htmlString);
 	}
@@ -99,7 +100,13 @@ class nokogiri implements IteratorAggregate{
 		}
 		return $this->_xpath;
 	}
-	public function getXpathSubquery($expression, $rel = false){
+	public function getXpathSubquery($expression, $rel = false, $compile = true){
+		if ($compile){
+			$key = $expression.($rel?'>':'*');
+			if (isset($this->_compiledXpath[$key])){
+				return $this->_compiledXpath[$key];
+			}
+		}
 		$query = '';
 		if (preg_match(self::regexp, $expression, $subs)){
 			$brackets = array();
@@ -143,8 +150,11 @@ class nokogiri implements IteratorAggregate{
 				;
 			$left = trim(substr($expression, strlen($subs[0])));
 			if ('' !== $left){
-				$query .= $this->getXpathSubquery($left, '>'===$subs['rel']);
+				$query .= $this->getXpathSubquery($left, '>'===$subs['rel'], $compile);
 			}
+		}
+		if ($compile){
+			$this->_compiledXpath[$key] = $query;
 		}
 		return $query;
 	}
