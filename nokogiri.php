@@ -8,7 +8,7 @@
 class nokogiri implements IteratorAggregate{
 	const
 	regexp = 
-	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\)))?\s*(?P<rel>>)?/isS"
+	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\))?)?\s*(?P<rel>>)?/isS"
 	;
 	protected $_source = '';
 	/**
@@ -34,7 +34,7 @@ class nokogiri implements IteratorAggregate{
 		$class = "(\.(?P<class>[^\s:>#\.]+))?";
 		$child = "(first|last|nth)-child";
 		$expr = "(\((?P<expr>[^\)]+)\))";
-		$pseudo = "(:(?P<pseudo>".$child.")".$expr.")?";
+		$pseudo = "(:(?P<pseudo>".$child.")".$expr."?)?";
 		$rel = "\s*(?P<rel>>)?";
 		$regexp = "/".$tag.$attr.$id.$class.$pseudo.$rel."/isS";
 		return $regexp;
