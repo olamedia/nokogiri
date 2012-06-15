@@ -160,7 +160,7 @@ class nokogiri implements IteratorAggregate{
 				;
 			$left = trim(substr($expression, strlen($subs[0])));
 			if ('' !== $left){
-				$query .= $this->getXpathSubquery($left, '>'===$subs['rel'], $compile);
+				$query .= $this->getXpathSubquery($left, isset($subs['rel'])?'>'===$subs['rel']:false, $compile);
 			}
 		}
 		if ($compile){
