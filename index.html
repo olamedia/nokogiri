@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Nokogiri by olamedia</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Nokogiri</h1>
+          <h2>html parser for php</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/olamedia/nokogiri/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/olamedia/nokogiri/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/olamedia/nokogiri" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>Nokogiri</h1>
+
+<p>Данная библиотека - это быстрый парсер html кода, который способен работать с невалидным кодом.<br>
+На вход необходимо подавать документ в кодировке UTF-8 или DomDocument.<br>
+Для поиска элементов используются css-селекторы, которые преобразуются внутри в xpath выражение.<br>
+Полученное xpath выражение кешируется, если в методе get не был выставлен в false второй аргумент (стоит отключать кеширование только в случае динамической генерации css выражений).<br>
+В возвращаемыхч через -&gt;toArray() массивах находятся аттрибуты, текст под ключом #text и вложенные элементы под числовыми ключами.<br>
+Альтернативные методы: -&gt;toXml() возвращает HTML-строку, -&gt;getDom() возвращает DOMDocument<br></p>
+
+<h2>Basic usage</h2>
+
+<h2>Примеры использования</h2>
+
+<div class="highlight">
+<pre><span class="cp">&lt;?php</span>
+<span class="nv">$html</span> <span class="o">=</span> <span class="nb">gzdecode</span><span class="p">(</span><span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">'http://habrahabr.ru/'</span><span class="p">));</span>
+
+<span class="nv">$saw</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">nokogiri</span><span class="p">(</span><span class="nv">$html</span><span class="p">);</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$saw</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'a.habracut'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">());</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$saw</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'ul.panel-nav-top li.current'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">());</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$saw</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'#sidebar dl.air-comment a.topic'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">());</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$saw</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'a[rel=bookmark]'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">());</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$saw</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'#sidebar a.topic'</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$link</span><span class="p">){</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$link</span><span class="p">[</span><span class="s1">'#text'</span><span class="p">]);</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<p>HTML errors will be ignored.
+Creating from HTML string: <code>nokogiri::fromHtml($htmlString)</code> or <code>new nokogiri($htmlString)</code>
+Creating from DomDocument: <code>nokogiri::fromDom($dom)</code></p>
+
+<p>Ошибки html игнорируются.
+Создание из строки HTML: nokogiri::fromHtml($htmlString); или new nokogiri($htmlString);
+Создание из DomDocument: nokogiri::fromDom($dom);</p>
+
+<h2>Implemented css selectors</h2>
+
+<h2>Реализованные селекторы</h2>
+
+<ul>
+<li>tag</li>
+<li>.class</li>
+<li>#id</li>
+<li>[attr=value]</li>
+<li>:first-child</li>
+<li>:last-child</li>
+<li>:nth-child(a)</li>
+<li>:nth-child(an+b)</li>
+<li>:nth-child(even/odd)</li>
+</ul><h2>Requirements</h2>
+
+<h2>Требования</h2>
+
+<ul>
+<li>DOM</li>
+<li>libxml</li>
+<li>PHP</li>
+</ul><h2>Links</h2>
+
+<h2>Ссылки</h2>
+
+<p>Статьи на хабре:</p>
+
+<ul>
+<li><a href="http://habrahabr.ru/blogs/php/110112/">Нокогири: парсинг HTML в одну строку</a></li>
+<li><a href="http://habrahabr.ru/blogs/php/114323/">Сравнение библиотек для парсинга</a></li>
+</ul>
+        </section>
+
+        <footer>
+          Nokogiri is maintained by <a href="https://github.com/olamedia">olamedia</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
