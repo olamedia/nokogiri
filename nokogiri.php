@@ -88,7 +88,7 @@ class nokogiri implements IteratorAggregate{
 	protected function getNodes(){
 
 	}
-	protected function getDom(){
+	public function getDom(){
 		if ($this->_dom instanceof DOMDocument){
 			return $this->_dom;
 		}elseif ($this->_dom instanceof DOMNodeList){
