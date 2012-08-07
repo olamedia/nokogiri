@@ -202,12 +202,8 @@ class nokogiri implements IteratorAggregate{
 			}
 		}
 		if ($node->hasChildNodes()){
-			if ($node->childNodes->length == 1){
-				$array[$node->firstChild->nodeName] = $this->toArray($node->firstChild);
-			}else{
-				foreach ($node->childNodes as $childNode){
-					$array[$childNode->nodeName][] = $this->toArray($childNode);
-				}
+			foreach ($node->childNodes as $childNode){
+				$array[$childNode->nodeName][] = $this->toArray($childNode);
 			}
 		}
 		if ($xnode === null){
