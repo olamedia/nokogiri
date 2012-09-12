@@ -54,6 +54,11 @@ class nokogiri implements IteratorAggregate{
 		$me->loadHtml($htmlString);
 		return $me;
 	}
+	public static function fromHtmlNoCharset($htmlString){
+		$me = new self();
+		$me->loadHtmlNoCharset($htmlString);
+		return $me;
+	}
 	public static function fromDom($dom){
 		$me = new self();
 		$me->loadDom($dom);
@@ -62,11 +67,29 @@ class nokogiri implements IteratorAggregate{
 	public function loadDom($dom){
 		$this->_dom = $dom;
 	}
+	public function loadHtmlNoCharset($htmlString = ''){
+		$dom = new DOMDocument('1.0', 'UTF-8');
+		$dom->preserveWhiteSpace = false;
+		if (strlen($htmlString)){
+			libxml_use_internal_errors(true);
+			$doc->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
+			// dirty fix
+			foreach ($doc->childNodes as $item){
+			    if ($item->nodeType == XML_PI_NODE){
+			        $doc->removeChild($item); // remove hack
+			        break;
+			    }
+			}
+			$doc->encoding = 'UTF-8'; // insert proper
+			libxml_clear_errors();
+		}
+		$this->loadDom($dom);
+	}
 	public function loadHtml($htmlString = ''){
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		$dom->preserveWhiteSpace = false;
 		if (strlen($htmlString)){
-			libxml_use_internal_errors(TRUE);
+			libxml_use_internal_errors(true);
 			$dom->loadHTML($htmlString);
 			libxml_clear_errors();
 		}
