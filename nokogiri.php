@@ -72,15 +72,15 @@ class nokogiri implements IteratorAggregate{
 		$dom->preserveWhiteSpace = false;
 		if (strlen($htmlString)){
 			libxml_use_internal_errors(true);
-			$doc->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
+			$dom->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
 			// dirty fix
-			foreach ($doc->childNodes as $item){
+			foreach ($dom->childNodes as $item){
 			    if ($item->nodeType == XML_PI_NODE){
-			        $doc->removeChild($item); // remove hack
+			        $dom->removeChild($item); // remove hack
 			        break;
 			    }
 			}
-			$doc->encoding = 'UTF-8'; // insert proper
+			$dom->encoding = 'UTF-8'; // insert proper
 			libxml_clear_errors();
 		}
 		$this->loadDom($dom);
