@@ -1,0 +1,22 @@
+{
+    "name": "olamedia/nokogiri",
+    "type": "library",
+    "description": "HTML Parser",
+    "keywords": ["html","parse","parser"],
+    "homepage": "http://github.com/olamedia/nokogiri",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "olamedia",
+            "email": "olamedia@gmail.com",
+            "homepage": "http://github.com/olamedia",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.1.0"
+    },
+    "autoload": {
+        "classmap": ["nokogiri.php"]
+    }
+}
