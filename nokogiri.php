@@ -165,6 +165,8 @@ class nokogiri implements IteratorAggregate{
 							$brackets[] = '(position() -1) mod 2 = 0 and position() >= 1';
 						}elseif('even' === $e){
 							$brackets[] = 'position() mod 2 = 0 and position() >= 0';
+						}elseif(preg_match("/^[0-9]+$/", $e)){
+							$brackets[] = 'position() = '.$e;
 						}elseif(preg_match("/^((?P<mul>[0-9]+)n\+)(?P<pos>[0-9]+)$/is", $e, $esubs)){
 							if (isset($esubs['mul'])){
 								$brackets[] = '(position() -'.$esubs['pos'].') mod '.$esubs['mul'].' = 0 and position() >= '.$esubs['pos'].'';
