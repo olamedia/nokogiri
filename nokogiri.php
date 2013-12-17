@@ -108,20 +108,28 @@ class nokogiri implements IteratorAggregate{
 		}*/
 		return $this->getElements($this->getXpathSubquery($expression, false, $compile));
 	}
+	public function find($expression, $compile = true){
+		return $this->get($expression, $compile)->toArray();
+	}
 	protected function getNodes(){
 
 	}
 	public function getDom(){
 		if ($this->_dom instanceof DOMDocument){
 			return $this->_dom;
-		}elseif ($this->_dom instanceof DOMNodeList){
+		} elseif ($this->_dom instanceof DOMNodeList || $this->_dom instanceof DOMElement){
 			if ($this->_tempDom === null){
 				$this->_tempDom = new DOMDocument('1.0', 'UTF-8');
 				$root = $this->_tempDom->createElement('root');
 				$this->_tempDom->appendChild($root);
-				foreach ($this->_dom as $domElement){
-					$domNode = $this->_tempDom->importNode($domElement, true);
-					$root->appendChild($domNode);
+				if ($this->_dom instanceof DOMNodeList){
+					foreach ($this->_dom as $domElement){
+						$domNode = $this->_tempDom->importNode($domElement, true);
+						$root->appendChild($domNode);
+					} 
+				} else {
+					$domNode = $this->_tempDom->importNode($this->_dom, true);
+					$root->appendChild($domNode);   
 				}
 			}
 			return $this->_tempDom;
@@ -156,21 +164,21 @@ class nokogiri implements IteratorAggregate{
 			if (isset($subs['pseudo']) && '' !== $subs['pseudo']){
 				if ('first-child' === $subs['pseudo']){
 					$brackets[] = '1';
-				}elseif ('last-child' === $subs['pseudo']){
+				} elseif ('last-child' === $subs['pseudo']){
 					$brackets[] = 'last()';
-				}elseif ('nth-child' === $subs['pseudo']){
+				} elseif ('nth-child' === $subs['pseudo']){
 					if (isset($subs['expr']) && '' !== $subs['expr']){
 						$e = $subs['expr'];
-						if('odd' === $e){
+						if ('odd' === $e){
 							$brackets[] = '(position() -1) mod 2 = 0 and position() >= 1';
-						}elseif('even' === $e){
+						} elseif ('even' === $e){
 							$brackets[] = 'position() mod 2 = 0 and position() >= 0';
-						}elseif(preg_match("/^[0-9]+$/", $e)){
+						} elseif (preg_match("/^[0-9]+$/", $e)){
 							$brackets[] = 'position() = '.$e;
-						}elseif(preg_match("/^((?P<mul>[0-9]+)n\+)(?P<pos>[0-9]+)$/is", $e, $esubs)){
+						} elseif (preg_match("/^((?P<mul>[0-9]+)n\+)(?P<pos>[0-9]+)$/is", $e, $esubs)){
 							if (isset($esubs['mul'])){
 								$brackets[] = '(position() -'.$esubs['pos'].') mod '.$esubs['mul'].' = 0 and position() >= '.$esubs['pos'].'';
-							}else{
+							} else{
 								$brackets[] = ''.$e.'';
 							}
 						}
@@ -215,7 +223,7 @@ class nokogiri implements IteratorAggregate{
 				return $array;
 			}
 			$node = $this->getDom();
-		}else{
+		} else{
 			$node = $xnode;
 		}
 		if (in_array($node->nodeType, array(XML_TEXT_NODE,XML_COMMENT_NODE))){
@@ -235,6 +243,38 @@ class nokogiri implements IteratorAggregate{
 			return reset(reset($array)); // first child
 		}
 		return $array;
+	}
+    // Первый параметр может быть массивом или строкой. Во втором случае принимаем его за $glue
+    public function toText($param = null, $glue = null){
+        if (!is_array($param))           $arr = $this->toArray();
+        else $arr = $param;
+        
+        if (is_string($param) && !$glue) $glue = $param;
+        
+        if (isset($arr['#text'])) $str = $glue.implode($glue, $arr['#text']);
+        else $str = '';
+        
+        foreach($arr as $key => $item){
+            if (is_array($item)) $str .= $this->toText($item);
+        }
+        return $str;
+    }
+    // Одномерный массив toText() каждого элемента в наборе
+    public function toTextArray(){
+        $array = array();
+        if ($this->_dom instanceof DOMNodeList){
+            foreach ($this->_dom as $node){
+                $array[] = $this->toText($this->toArray($node));
+            }
+            return $array;
+        }
+        return array(0 => $this->toArray());
+    }
+    public function toDom(){
+		return $this->getDom();
+	}
+	public function toNodes(){
+		return $this->_dom;
 	}
 	public function getIterator(){
 		$a = $this->toArray();
