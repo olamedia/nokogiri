@@ -108,6 +108,9 @@ class nokogiri implements IteratorAggregate{
 		}*/
 		return $this->getElements($this->getXpathSubquery($expression, false, $compile));
 	}
+	public function find($expression, $compile = true){
+		return $this->get($expression, $compile)->toArray();
+	}
 	protected function getNodes(){
 
 	}
@@ -240,6 +243,12 @@ class nokogiri implements IteratorAggregate{
 			return reset(reset($array)); // first child
 		}
 		return $array;
+	}
+    public function toDom(){
+		return $this->getDom();
+	}
+	public function toNodes(){
+		return $this->_dom;
 	}
 	public function getIterator(){
 		$a = $this->toArray();
