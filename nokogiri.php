@@ -207,6 +207,9 @@ class nokogiri implements IteratorAggregate{
 			return self::fromDom($nodeList);
 		}
 	}
+	public function toDom(){
+		return $this->getDom();
+	}
 	public function toXml(){
 		return $this->getDom()->saveXML();
 	}
