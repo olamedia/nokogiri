@@ -114,14 +114,19 @@ class nokogiri implements IteratorAggregate{
 	public function getDom(){
 		if ($this->_dom instanceof DOMDocument){
 			return $this->_dom;
-		}elseif ($this->_dom instanceof DOMNodeList){
+		}elseif ($this->_dom instanceof DOMNodeList || $this->_dom instanceof DOMElement){
 			if ($this->_tempDom === null){
 				$this->_tempDom = new DOMDocument('1.0', 'UTF-8');
 				$root = $this->_tempDom->createElement('root');
 				$this->_tempDom->appendChild($root);
-				foreach ($this->_dom as $domElement){
-					$domNode = $this->_tempDom->importNode($domElement, true);
-					$root->appendChild($domNode);
+				if($this->_dom instanceof DOMNodeList){
+					foreach ($this->_dom as $domElement){
+						$domNode = $this->_tempDom->importNode($domElement, true);
+						$root->appendChild($domNode);
+					} 
+				} else {
+					$domNode = $this->_tempDom->importNode($this->_dom, true);
+					$root->appendChild($domNode);   
 				}
 			}
 			return $this->_tempDom;
