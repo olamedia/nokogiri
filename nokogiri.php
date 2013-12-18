@@ -244,32 +244,49 @@ class nokogiri implements IteratorAggregate{
 		}
 		return $array;
 	}
-    // Первый параметр может быть массивом или строкой. Во втором случае принимаем его за $glue
-    public function toText($param = null, $glue = null){
-        if (!is_array($param))           $arr = $this->toArray();
-        else $arr = $param;
-        
-        if (is_string($param) && !$glue) $glue = $param;
-        
-        if (isset($arr['#text'])) $str = $glue.implode($glue, $arr['#text']);
+    public function toText($arr, $glue = " "){
+        return trim($this->_get_text_recursive($arr, $glue));
+    }
+    
+    private function _get_text_recursive($arr, $glue = "\n"){
+        if(isset($arr['#text'])) $str =  $glue.implode($glue, $arr['#text']);
+        // elseif(isset($arr['value'])) $str =  $glue.implode($glue, $arr['value']);
         else $str = '';
-        
         foreach($arr as $key => $item){
-            if (is_array($item)) $str .= $this->toText($item);
+            if(is_array($item)) $str .= $this->_get_text_recursive($item, $glue);
         }
         return $str;
     }
-    // Одномерный массив toText() каждого элемента в наборе
-    public function toTextArray(){
+    
+    // Возвращает одномерный массив toText() каждого элемента в наборе
+    // Первый параметр может быть массивом селекторов или строкой. Во втором случае принимаем его за $glue
+    public function toTextArray($param = null, $glue = " "){
+        if (is_array($param)) $selectors = $param;
+        else $selectors = array(); 
+        
+        if (is_string($param) && !$glue) $glue = $param;
+        $arr = $this->toArray();
+        
         $array = array();
+        
         if ($this->_dom instanceof DOMNodeList){
-            foreach ($this->_dom as $node){
-                $array[] = $this->toText($this->toArray($node));
+            if ($selectors){
+                foreach ($this->_dom as $node){
+                    foreach ($selectors as $key => $selector){
+                        $tmp[$key] = $this->toText( self::fromDom($node)->get($selector)->toArray() );
+                    }
+                    $array[] = $tmp;
+                }
+            } else {
+                foreach ($this->_dom as $node){
+                    $array[] = $this->toText($this->toArray($node));
+                }
             }
             return $array;
         }
         return array(0 => $this->toArray());
     }
+    
     public function toDom(){
 		return $this->getDom();
 	}
