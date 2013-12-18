@@ -282,6 +282,9 @@ class nokogiri implements IteratorAggregate{
 	public function toTextArray($skipChildren = false, $singleLevel = true){
 		return $this->_toTextArray($this->_dom, $skipChildren, $singleLevel);
 	}
+	public function toText($glue = ' ', $skipChildren = false){
+		return implode($glue, $this->toTextArray($skipChildren, true));
+	}
 }
 
 
