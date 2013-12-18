@@ -244,11 +244,7 @@ class nokogiri implements IteratorAggregate{
 		}
 		return $array;
 	}
-    public function toText($arr, $glue = " "){
-        return trim($this->_get_text_recursive($arr, $glue));
-    }
-    
-    private function _get_text_recursive($arr, $glue = "\n"){
+    private function _get_text_recursive($arr, $glue = " "){
         if(isset($arr['#text'])) $str =  $glue.implode($glue, $arr['#text']);
         // elseif(isset($arr['value'])) $str =  $glue.implode($glue, $arr['value']);
         else $str = '';
@@ -257,15 +253,21 @@ class nokogiri implements IteratorAggregate{
         }
         return $str;
     }
-    
-    // Возвращает одномерный массив toText() каждого элемента в наборе
-    // Первый параметр может быть массивом селекторов или строкой. Во втором случае принимаем его за $glue
-    public function toTextArray($param = null, $glue = " "){
-        if (is_array($param)) $selectors = $param;
-        else $selectors = array(); 
+   
+    /**
+    * Первый параметр может быть массивом селекторов или строкой. Во втором случае принимаем его за $glue
+    * Возвращает одно- или двумерный массив toText() каждого элемента в наборе
+    * Если передан массив селекторов, то вернёт двумерный массив с результатами субвыборки
+    */
+    public function toTextArray($param = null, $glue = null){
+        if (is_array($param)){
+            $selectors = $param;
+        } else {
+            $selectors = array(); 
+        }
         
-        if (is_string($param) && !$glue) $glue = $param;
-        $arr = $this->toArray();
+        if (is_string($param) && !$glue) {   $glue = $param;    }
+        if (is_null($glue))              {   $glue = ' ';       }
         
         $array = array();
         
@@ -273,7 +275,7 @@ class nokogiri implements IteratorAggregate{
             if ($selectors){
                 foreach ($this->_dom as $node){
                     foreach ($selectors as $key => $selector){
-                        $tmp[$key] = $this->toText( self::fromDom($node)->get($selector)->toArray() );
+                        $tmp[$key] = trim($this->_get_text_recursive( self::fromDom($node)->get($selector)->toArray() ));
                     }
                     $array[] = $tmp;
                 }
