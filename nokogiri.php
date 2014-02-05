@@ -248,7 +248,7 @@ class nokogiri implements IteratorAggregate{
 		$a = $this->toArray();
 		return new ArrayIterator($a);
 	}
-	protected function _toTextArray($node = null, $skipChildren = false, $singleLevel = tru){
+	protected function _toTextArray($node = null, $skipChildren = false, $singleLevel = true){
 		$array = array();
 		if ($node === null){
 			if ($this->_dom instanceof DOMNodeList){
