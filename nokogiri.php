@@ -34,6 +34,10 @@ class nokogiri implements IteratorAggregate{
 	 * */
 	protected $_xpath = null;
 	protected static $_compiledXpath = array();
+	/**
+	 * @var libxmlErrors
+	 */
+	protected $_libxmlErrors = null;
 	public function __construct($htmlString = ''){
 		$this->loadHtml($htmlString);
 	}
@@ -81,6 +85,7 @@ class nokogiri implements IteratorAggregate{
 			    }
 			}
 			$dom->encoding = 'UTF-8'; // insert proper
+			$this->_libxmlErrors = libxml_get_errors();
 			libxml_clear_errors();
 		}
 		$this->loadDom($dom);
@@ -91,6 +96,7 @@ class nokogiri implements IteratorAggregate{
 		if (strlen($htmlString)){
 			libxml_use_internal_errors(true);
 			$dom->loadHTML($htmlString);
+			$this->_libxmlErrors = libxml_get_errors();
 			libxml_clear_errors();
 		}
 		$this->loadDom($dom);
@@ -109,7 +115,7 @@ class nokogiri implements IteratorAggregate{
 		return $this->getElements($this->getXpathSubquery($expression, false, $compile));
 	}
 	protected function getNodes(){
-
+		return $this->_dom;
 	}
 	public function getDom(){
 		if ($this->_dom instanceof DOMDocument){
@@ -249,6 +255,12 @@ class nokogiri implements IteratorAggregate{
 	public function getIterator(){
 		$a = $this->toArray();
 		return new ArrayIterator($a);
+	}
+	public function getErrors(){
+		return $this->_libxmlErrors;
+	}
+	public function toNodes(){
+		return $this->getNodes();
 	}
 	protected function _toTextArray($node = null, $skipChildren = false, $singleLevel = true){
 		$array = array();
