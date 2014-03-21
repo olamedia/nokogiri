@@ -33,6 +33,10 @@ class nokogiri implements IteratorAggregate{
 	 * @var DOMXpath
 	 * */
 	protected $_xpath = null;
+	/**
+ 	 * @var libxmlErrors
+ 	 */
+	protected $_libxmlErrors = null;
 	protected static $_compiledXpath = array();
 	public function __construct($htmlString = ''){
 		$this->loadHtml($htmlString);
@@ -91,10 +95,14 @@ class nokogiri implements IteratorAggregate{
 		if (strlen($htmlString)){
 			libxml_use_internal_errors(true);
 			$dom->loadHTML($htmlString);
+			$this->_libxmlErrors = libxml_get_errors();
 			libxml_clear_errors();
 		}
 		$this->loadDom($dom);
 	}
+	public function getErrors(){
+ 		return $this->_libxmlErrors;
+ 	}
 	function __invoke($expression){
 		return $this->get($expression);
 	}
