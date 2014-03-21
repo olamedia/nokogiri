@@ -38,6 +38,10 @@ class nokogiri implements IteratorAggregate{
  	 */
 	protected $_libxmlErrors = null;
 	protected static $_compiledXpath = array();
+	/**
+	 * @var libxmlErrors
+	 */
+	protected $_libxmlErrors = null;
 	public function __construct($htmlString = ''){
 		$this->loadHtml($htmlString);
 	}
@@ -120,7 +124,7 @@ class nokogiri implements IteratorAggregate{
 		return $this->getElements($this->getXpathSubquery($expression, false, $compile));
 	}
 	protected function getNodes(){
-
+		return $this->_dom;
 	}
 	public function getDom($asIs = false){
 		if ($asIs){
@@ -254,13 +258,21 @@ class nokogiri implements IteratorAggregate{
 			}
 		}
 		if ($xnode === null){
-			return reset(reset($array)); // first child
+			$tmp = reset($array); 
+			foreach ($tmp as $key => $elem) { if(empty($tmp[$key])) { unset($tmp[$key]); }  }
+			return reset($tmp); // first child
 		}
 		return $array;
 	}
 	public function getIterator(){
 		$a = $this->toArray();
 		return new ArrayIterator($a);
+	}
+	public function getErrors(){
+		return $this->_libxmlErrors;
+	}
+	public function toNodes(){
+		return $this->getNodes();
 	}
 	protected function _toTextArray($node = null, $skipChildren = false, $singleLevel = true){
 		$array = array();
