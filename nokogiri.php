@@ -120,7 +120,10 @@ class nokogiri implements IteratorAggregate{
 	protected function getNodes(){
 
 	}
-	public function getDom(){
+	public function getDom($asIs = false){
+		if ($asIs){
+			return $this->_dom;
+		}
 		if ($this->_dom instanceof DOMDocument){
 			return $this->_dom;
 		}elseif ($this->_dom instanceof DOMNodeList || $this->_dom instanceof DOMElement){
@@ -216,8 +219,8 @@ class nokogiri implements IteratorAggregate{
 			return self::fromDom($nodeList);
 		}
 	}
-	public function toDom(){
-		return $this->getDom();
+	public function toDom($asIs = false){
+		return $this->getDom($asIs);
 	}
 	public function toXml(){
 		return $this->getDom()->saveXML();
