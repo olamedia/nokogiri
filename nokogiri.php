@@ -76,6 +76,7 @@ class nokogiri implements IteratorAggregate{
 		$dom->preserveWhiteSpace = false;
 		if (strlen($htmlString)){
 			libxml_use_internal_errors(true);
+			$this->_libxmlErrors = null;
 			$dom->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
 			// dirty fix
 			foreach ($dom->childNodes as $item){
@@ -85,6 +86,7 @@ class nokogiri implements IteratorAggregate{
 			    }
 			}
 			$dom->encoding = 'UTF-8'; // insert proper
+			$this->_libxmlErrors = libxml_get_errors();
 			libxml_clear_errors();
 		}
 		$this->loadDom($dom);
