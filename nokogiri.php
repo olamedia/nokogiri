@@ -254,7 +254,8 @@ class nokogiri implements IteratorAggregate{
 			}
 		}
 		if ($xnode === null){
-			return reset(reset($array)); // first child
+			$a = reset($array);
+			return reset($a); // first child
 		}
 		return $array;
 	}
