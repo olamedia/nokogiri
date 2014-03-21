@@ -114,9 +114,6 @@ class nokogiri implements IteratorAggregate{
 		}*/
 		return $this->getElements($this->getXpathSubquery($expression, false, $compile));
 	}
-	protected function getNodes(){
-		return $this->_dom;
-	}
 	public function getDom(){
 		if ($this->_dom instanceof DOMDocument){
 			return $this->_dom;
@@ -260,7 +257,7 @@ class nokogiri implements IteratorAggregate{
 		return $this->_libxmlErrors;
 	}
 	public function toNodes(){
-		return $this->getNodes();
+		return ($this->_dom instanceof DOMNodeList ? $this->_dom : $this->_dom->childNodes);
 	}
 	protected function _toTextArray($node = null, $skipChildren = false, $singleLevel = true){
 		$array = array();
