@@ -94,6 +94,7 @@ class nokogiri implements IteratorAggregate{
 		$dom->preserveWhiteSpace = false;
 		if (strlen($htmlString)){
 			libxml_use_internal_errors(true);
+			$this->_libxmlErrors = null;
 			$dom->loadHTML($htmlString);
 			$this->_libxmlErrors = libxml_get_errors();
 			libxml_clear_errors();
