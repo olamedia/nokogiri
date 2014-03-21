@@ -1,4 +1,4 @@
-HTML parser | Парсер HTML
+HTML parser<br />Парсер HTML
 ===========
 Данная библиотека - это быстрый парсер html кода, который способен работать с невалидным кодом.<br />
 На вход необходимо подавать документ в кодировке UTF-8 или DomDocument.<br />
@@ -8,7 +8,7 @@ HTML parser | Парсер HTML
 Альтернативные методы: ->toXml() возвращает HTML-строку, ->getDom() возвращает DOMDocument<br />
 
 
-Basic usage | Примеры использования
+Basic usage<br />Примеры использования
 ===================================
 ```php
 <?php
@@ -34,7 +34,7 @@ Creating from DomDocument: `nokogiri::fromDom($dom)`
 Создание из DomDocument: nokogiri::fromDom($dom);
 
 
-Implemented css selectors | Реализованные селекторы
+Implemented css selectors<br />Реализованные селекторы
 =========================
 * tag
 * .class
@@ -47,13 +47,13 @@ Implemented css selectors | Реализованные селекторы
 * :nth-child(even/odd)
 
 
-Requirements | Требования
+Requirements<br />Требования
 ============
 DOM
 libxml
 PHP
 
-Links | Ссылки
+Links<br />Ссылки
 ============
 Статьи на хабре:
 
