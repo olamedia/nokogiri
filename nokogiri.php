@@ -80,7 +80,7 @@ class nokogiri implements IteratorAggregate{
 			$dom->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
 			// dirty fix
 			foreach ($dom->childNodes as $item){
-			    if ($item->nodeType == XML_PI_NODE){
+			    if ($item->nodeType === XML_PI_NODE){
 			        $dom->removeChild($item); // remove hack
 			        break;
 			    }
