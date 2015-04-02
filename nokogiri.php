@@ -209,7 +209,7 @@ class nokogiri implements IteratorAggregate{
 		if ($xpathQuery !== ''){
 			$nodeList = $this->getXpath()->query($xpathQuery);
 			if ($nodeList === false){
-				throw new Exception('Malformed xpath');
+				throw new RuntimeException('Malformed xpath');
 			}
 			return self::fromDom($nodeList);
 		}
