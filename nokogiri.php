@@ -24,19 +24,19 @@ class nokogiri implements IteratorAggregate{
 	/**
 	 * @var DOMDocument
 	 */
-	protected $_dom = null;
+	protected $_dom;
 	/**
 	 * @var DOMDocument
 	 */
-	protected $_tempDom = null;
+	protected $_tempDom;
 	/**
 	 * @var DOMXpath
 	 * */
-	protected $_xpath = null;
+	protected $_xpath;
 	/**
  	 * @var libxmlErrors
  	 */
-	protected $_libxmlErrors = null;
+	protected $_libxmlErrors;
 	protected static $_compiledXpath = array();
 	public function __construct($htmlString = ''){
 		$this->loadHtml($htmlString);
