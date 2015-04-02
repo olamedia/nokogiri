@@ -34,7 +34,7 @@ class nokogiri implements IteratorAggregate{
 	 * */
 	protected $_xpath;
 	/**
- 	 * @var libxmlErrors
+ 	 * @var libXMLError
  	 */
 	protected $_libxmlErrors;
 	protected static $_compiledXpath = array();
