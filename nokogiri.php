@@ -256,15 +256,15 @@ class nokogiri implements IteratorAggregate{
 		$a = $this->toArray();
 		return new ArrayIterator($a);
 	}
-	protected function _toTextArray($node = null, $skipChildren = false, $singleLevel = true){
+	protected function toTextArrayRecursive($node = null, $skipChildren = false, $singleLevel = true){
 		$array = array();
 		if ($node === null){
 			if ($this->_dom instanceof DOMNodeList){
 				foreach ($this->_dom as $node){
 					if ($singleLevel){
-						$array = array_merge($array, $this->_toTextArray($node, $skipChildren, $singleLevel));
+						$array = array_merge($array, $this->toTextArrayRecursive($node, $skipChildren, $singleLevel));
 					}else{
-						$array[] = $this->_toTextArray($node, $skipChildren, $singleLevel);
+						$array[] = $this->toTextArrayRecursive($node, $skipChildren, $singleLevel);
 					}
 				}
 				return $array;
@@ -278,9 +278,9 @@ class nokogiri implements IteratorAggregate{
 			if ($node->hasChildNodes()){
 				foreach ($node->childNodes as $childNode){
 					if ($singleLevel){
-						$array = array_merge($array, $this->_toTextArray($childNode, $skipChildren, $singleLevel));
+						$array = array_merge($array, $this->toTextArrayRecursive($childNode, $skipChildren, $singleLevel));
 					}else{
-						$array[] = $this->_toTextArray($childNode, $skipChildren, $singleLevel);
+						$array[] = $this->toTextArrayRecursive($childNode, $skipChildren, $singleLevel);
 					}
 				}
 			}
@@ -288,7 +288,7 @@ class nokogiri implements IteratorAggregate{
 		return $array;
 	}
 	public function toTextArray($skipChildren = false, $singleLevel = true){
-		return $this->_toTextArray($this->_dom, $skipChildren, $singleLevel);
+		return $this->toTextArrayRecursive($this->_dom, $skipChildren, $singleLevel);
 	}
 	public function toText($glue = ' ', $skipChildren = false){
 		return implode($glue, $this->toTextArray($skipChildren, true));
