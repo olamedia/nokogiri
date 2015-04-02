@@ -42,15 +42,15 @@ class nokogiri implements IteratorAggregate{
 		$this->loadHtml($htmlString);
 	}
 	public function getRegexp(){
-		$tag = "(?P<tag>[a-z0-9]+)?";
-		$attr = "(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?";
-		$id = "(#(?P<id>[^\s:>#\.]+))?";
-		$class = "(\.(?P<class>[^\s:>#\.]+))?";
-		$child = "(first|last|nth)-child";
-		$expr = "(\((?P<expr>[^\)]+)\))";
-		$pseudo = "(:(?P<pseudo>".$child.")".$expr."?)?";
-		$rel = "\s*(?P<rel>>)?";
-		$regexp = "/".$tag.$attr.$id.$class.$pseudo.$rel."/isS";
+		$tag = '(?P<tag>[a-z0-9]+)?';
+		$attr = '(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?';
+		$id = '(#(?P<id>[^\s:>#\.]+))?';
+		$class = '(\.(?P<class>[^\s:>#\.]+))?';
+		$child = '(first|last|nth)-child';
+		$expr = '(\((?P<expr>[^\)]+)\))';
+		$pseudo = '(:(?P<pseudo>'.$child.')'.$expr.'?)?';
+		$rel = '\s*(?P<rel>>)?';
+		$regexp = '/'.$tag.$attr.$id.$class.$pseudo.$rel.'/isS';
 		return $regexp;
 	}
 	public static function fromHtml($htmlString){
@@ -156,11 +156,11 @@ class nokogiri implements IteratorAggregate{
 		if (preg_match(self::REGEXP, $expression, $subs)){
 			$brackets = array();
 			if (isset($subs['id']) && '' !== $subs['id']){
-				$brackets[] = "@id='".$subs['id']."'";
+				$brackets[] = '@id=\''.$subs['id']."'";
 			}
 			if (isset($subs['attr']) && '' !== $subs['attr']){
 				$attrValue = isset($subs['value']) && !empty($subs['value'])?$subs['value']:'';
-				$brackets[] = "@".$subs['attr']."='".$attrValue."'";
+				$brackets[] = '@'.$subs['attr'].'=\''.$attrValue."'";
 			}
 			if (isset($subs['class']) && '' !== $subs['class']){
 				$brackets[] = 'contains(concat(" ", normalize-space(@class), " "), " '.$subs['class'].' ")';
@@ -274,16 +274,14 @@ class nokogiri implements IteratorAggregate{
 		if (XML_TEXT_NODE === $node->nodeType){
 			return array($node->nodeValue);
 		}
-		if (!$skipChildren){
-			if ($node->hasChildNodes()){
-				foreach ($node->childNodes as $childNode){
-					if ($singleLevel){
-						$array = array_merge($array, $this->toTextArrayRecursive($childNode, $skipChildren, $singleLevel));
-					}else{
-						$array[] = $this->toTextArrayRecursive($childNode, $skipChildren, $singleLevel);
-					}
-				}
-			}
+		if (!$skipChildren && $node->hasChildNodes()){
+            foreach ($node->childNodes as $childNode) {
+                if ($singleLevel) {
+                    $array = array_merge($array, $this->toTextArrayRecursive($childNode, $skipChildren, $singleLevel));
+                } else {
+                    $array[] = $this->toTextArrayRecursive($childNode, $skipChildren, $singleLevel);
+                }
+            }
 		}
 		return $array;
 	}
