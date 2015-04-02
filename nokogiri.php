@@ -17,7 +17,7 @@
  */
 class nokogiri implements IteratorAggregate{
 	const
-	regexp = 
+	REGEXP =
 	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\))?)?\s*(?P<rel>>)?/isS"
 	;
 	protected $_source = '';
@@ -153,7 +153,7 @@ class nokogiri implements IteratorAggregate{
 			}
 		}
 		$query = '';
-		if (preg_match(self::regexp, $expression, $subs)){
+		if (preg_match(self::REGEXP, $expression, $subs)){
 			$brackets = array();
 			if (isset($subs['id']) && '' !== $subs['id']){
 				$brackets[] = "@id='".$subs['id']."'";
