@@ -106,7 +106,7 @@ class nokogiri implements IteratorAggregate{
 	public function getErrors(){
  		return $this->_libxmlErrors;
  	}
-	function __invoke($expression){
+	public function __invoke($expression){
 		return $this->get($expression);
 	}
 	public function get($expression, $compile = true){
