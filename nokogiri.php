@@ -74,7 +74,7 @@ class nokogiri implements IteratorAggregate{
 	public function loadHtmlNoCharset($htmlString = ''){
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		$dom->preserveWhiteSpace = false;
-		if ($htmlString !== ''){
+		if ((string)$htmlString !== ''){
 			libxml_use_internal_errors(true);
 			$this->_libxmlErrors = null;
 			$dom->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
@@ -94,7 +94,7 @@ class nokogiri implements IteratorAggregate{
 	public function loadHtml($htmlString = ''){
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		$dom->preserveWhiteSpace = false;
-		if ($htmlString !== ''){
+		if ((string)$htmlString !== ''){
 			libxml_use_internal_errors(true);
 			$this->_libxmlErrors = null;
 			$dom->loadHTML($htmlString);
