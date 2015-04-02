@@ -17,40 +17,40 @@
  */
 class nokogiri implements IteratorAggregate{
 	const
-	regexp = 
+	REGEXP =
 	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\))?)?\s*(?P<rel>>)?/isS"
 	;
 	protected $_source = '';
 	/**
 	 * @var DOMDocument
 	 */
-	protected $_dom = null;
+	protected $_dom;
 	/**
 	 * @var DOMDocument
 	 */
-	protected $_tempDom = null;
+	protected $_tempDom;
 	/**
 	 * @var DOMXpath
 	 * */
-	protected $_xpath = null;
+	protected $_xpath;
 	/**
- 	 * @var libxmlErrors
+ 	 * @var libXMLError
  	 */
-	protected $_libxmlErrors = null;
+	protected $_libxmlErrors;
 	protected static $_compiledXpath = array();
 	public function __construct($htmlString = ''){
 		$this->loadHtml($htmlString);
 	}
 	public function getRegexp(){
-		$tag = "(?P<tag>[a-z0-9]+)?";
-		$attr = "(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?";
-		$id = "(#(?P<id>[^\s:>#\.]+))?";
-		$class = "(\.(?P<class>[^\s:>#\.]+))?";
-		$child = "(first|last|nth)-child";
-		$expr = "(\((?P<expr>[^\)]+)\))";
-		$pseudo = "(:(?P<pseudo>".$child.")".$expr."?)?";
-		$rel = "\s*(?P<rel>>)?";
-		$regexp = "/".$tag.$attr.$id.$class.$pseudo.$rel."/isS";
+		$tag = '(?P<tag>[a-z0-9]+)?';
+		$attr = '(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?';
+		$id = '(#(?P<id>[^\s:>#\.]+))?';
+		$class = '(\.(?P<class>[^\s:>#\.]+))?';
+		$child = '(first|last|nth)-child';
+		$expr = '(\((?P<expr>[^\)]+)\))';
+		$pseudo = '(:(?P<pseudo>'.$child.')'.$expr.'?)?';
+		$rel = '\s*(?P<rel>>)?';
+		$regexp = '/'.$tag.$attr.$id.$class.$pseudo.$rel.'/isS';
 		return $regexp;
 	}
 	public static function fromHtml($htmlString){
@@ -74,13 +74,13 @@ class nokogiri implements IteratorAggregate{
 	public function loadHtmlNoCharset($htmlString = ''){
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		$dom->preserveWhiteSpace = false;
-		if (strlen($htmlString)){
+		if ((string)$htmlString !== ''){
 			libxml_use_internal_errors(true);
 			$this->_libxmlErrors = null;
 			$dom->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
 			// dirty fix
 			foreach ($dom->childNodes as $item){
-			    if ($item->nodeType == XML_PI_NODE){
+			    if ($item->nodeType === XML_PI_NODE){
 			        $dom->removeChild($item); // remove hack
 			        break;
 			    }
@@ -94,7 +94,7 @@ class nokogiri implements IteratorAggregate{
 	public function loadHtml($htmlString = ''){
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		$dom->preserveWhiteSpace = false;
-		if (strlen($htmlString)){
+		if ((string)$htmlString !== ''){
 			libxml_use_internal_errors(true);
 			$this->_libxmlErrors = null;
 			$dom->loadHTML($htmlString);
@@ -106,17 +106,10 @@ class nokogiri implements IteratorAggregate{
 	public function getErrors(){
  		return $this->_libxmlErrors;
  	}
-	function __invoke($expression){
+	public function __invoke($expression){
 		return $this->get($expression);
 	}
 	public function get($expression, $compile = true){
-		/*if (strpos($expression, ' ') !== false){
-			$a = explode(' ', $expression);
-			foreach ($a as $k=>$sub){
-				$a[$k] = $this->getXpathSubquery($sub);
-			}
-			return $this->getElements(implode('', $a));
-		}*/
 		return $this->getElements($this->getXpathSubquery($expression, false, $compile));
 	}
 	protected function getNodes(){
@@ -160,14 +153,14 @@ class nokogiri implements IteratorAggregate{
 			}
 		}
 		$query = '';
-		if (preg_match(self::regexp, $expression, $subs)){
+		if (preg_match(self::REGEXP, $expression, $subs)){
 			$brackets = array();
 			if (isset($subs['id']) && '' !== $subs['id']){
-				$brackets[] = "@id='".$subs['id']."'";
+				$brackets[] = '@id=\''.$subs['id']."'";
 			}
 			if (isset($subs['attr']) && '' !== $subs['attr']){
 				$attrValue = isset($subs['value']) && !empty($subs['value'])?$subs['value']:'';
-				$brackets[] = "@".$subs['attr']."='".$attrValue."'";
+				$brackets[] = '@'.$subs['attr'].'=\''.$attrValue."'";
 			}
 			if (isset($subs['class']) && '' !== $subs['class']){
 				$brackets[] = 'contains(concat(" ", normalize-space(@class), " "), " '.$subs['class'].' ")';
@@ -213,13 +206,14 @@ class nokogiri implements IteratorAggregate{
 		return $query;
 	}
 	protected function getElements($xpathQuery){
-		if (strlen($xpathQuery)){
+		if ($xpathQuery !== ''){
 			$nodeList = $this->getXpath()->query($xpathQuery);
 			if ($nodeList === false){
-				throw new Exception('Malformed xpath');
+				throw new RuntimeException('Malformed xpath');
 			}
 			return self::fromDom($nodeList);
 		}
+        return false;
 	}
 	public function toDom($asIs = false){
 		return $this->getDom($asIs);
@@ -240,7 +234,7 @@ class nokogiri implements IteratorAggregate{
 		}else{
 			$node = $xnode;
 		}
-		if (in_array($node->nodeType, array(XML_TEXT_NODE,XML_COMMENT_NODE))){
+		if (in_array($node->nodeType, array(XML_TEXT_NODE,XML_COMMENT_NODE), true)){
 			return $node->nodeValue;
 		}
 		if ($node->hasAttributes()){
@@ -263,15 +257,15 @@ class nokogiri implements IteratorAggregate{
 		$a = $this->toArray();
 		return new ArrayIterator($a);
 	}
-	protected function _toTextArray($node = null, $skipChildren = false, $singleLevel = true){
+	protected function toTextArrayRecursive($node = null, $skipChildren = false, $singleLevel = true){
 		$array = array();
 		if ($node === null){
 			if ($this->_dom instanceof DOMNodeList){
 				foreach ($this->_dom as $node){
 					if ($singleLevel){
-						$array = array_merge($array, $this->_toTextArray($node, $skipChildren, $singleLevel));
+						$array = array_merge($array, $this->toTextArrayRecursive($node, $skipChildren, $singleLevel));
 					}else{
-						$array[] = $this->_toTextArray($node, $skipChildren, $singleLevel);
+						$array[] = $this->toTextArrayRecursive($node, $skipChildren, $singleLevel);
 					}
 				}
 				return $array;
@@ -281,31 +275,21 @@ class nokogiri implements IteratorAggregate{
 		if (XML_TEXT_NODE === $node->nodeType){
 			return array($node->nodeValue);
 		}
-		if (!$skipChildren){
-			if ($node->hasChildNodes()){
-				foreach ($node->childNodes as $childNode){
-					if ($singleLevel){
-						$array = array_merge($array, $this->_toTextArray($childNode, $skipChildren, $singleLevel));
-					}else{
-						$array[] = $this->_toTextArray($childNode, $skipChildren, $singleLevel);
-					}
-				}
-			}
+		if (!$skipChildren && $node->hasChildNodes()){
+            foreach ($node->childNodes as $childNode) {
+                if ($singleLevel) {
+                    $array = array_merge($array, $this->toTextArrayRecursive($childNode, $skipChildren, $singleLevel));
+                } else {
+                    $array[] = $this->toTextArrayRecursive($childNode, $skipChildren, $singleLevel);
+                }
+            }
 		}
 		return $array;
 	}
 	public function toTextArray($skipChildren = false, $singleLevel = true){
-		return $this->_toTextArray($this->_dom, $skipChildren, $singleLevel);
+		return $this->toTextArrayRecursive($this->_dom, $skipChildren, $singleLevel);
 	}
 	public function toText($glue = ' ', $skipChildren = false){
 		return implode($glue, $this->toTextArray($skipChildren, true));
 	}
 }
-
-
-/*$saw = new nokogiri();
-echo $saw->getXpathSubquery('#boo #ge > #id:nth-child(3n+5)');
-echo "\r\n";*/
-
-
-
