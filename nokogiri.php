@@ -110,13 +110,6 @@ class nokogiri implements IteratorAggregate{
 		return $this->get($expression);
 	}
 	public function get($expression, $compile = true){
-		/*if (strpos($expression, ' ') !== false){
-			$a = explode(' ', $expression);
-			foreach ($a as $k=>$sub){
-				$a[$k] = $this->getXpathSubquery($sub);
-			}
-			return $this->getElements(implode('', $a));
-		}*/
 		return $this->getElements($this->getXpathSubquery($expression, false, $compile));
 	}
 	protected function getNodes(){
@@ -301,11 +294,4 @@ class nokogiri implements IteratorAggregate{
 		return implode($glue, $this->toTextArray($skipChildren, true));
 	}
 }
-
-
-/*$saw = new nokogiri();
-echo $saw->getXpathSubquery('#boo #ge > #id:nth-child(3n+5)');
-echo "\r\n";*/
-
-
 
