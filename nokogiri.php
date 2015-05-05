@@ -259,17 +259,17 @@ class nokogiri implements IteratorAggregate{
 	protected function _toTextArray($node = null, $skipChildren = false, $singleLevel = true){
 		$array = array();
 		if ($node === null){
-			if ($this->_dom instanceof DOMNodeList){
-				foreach ($this->_dom as $node){
-					if ($singleLevel){
-						$array = array_merge($array, $this->_toTextArray($node, $skipChildren, $singleLevel));
-					}else{
-						$array[] = $this->_toTextArray($node, $skipChildren, $singleLevel);
-					}
-				}
-				return $array;
-			}
 			$node = $this->getDom();
+		}
+		if ($node instanceof DOMNodeList){
+			foreach ($node as $child){
+				if ($singleLevel){
+					$array = array_merge($array, $this->_toTextArray($child, $skipChildren, $singleLevel));
+				}else{
+					$array[] = $this->_toTextArray($child, $skipChildren, $singleLevel);
+				}
+			}
+			return $array;
 		}
 		if (XML_TEXT_NODE === $node->nodeType){
 			return array($node->nodeValue);
