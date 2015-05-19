@@ -39,6 +39,7 @@ Implemented css selectors<br />Реализованные селекторы
 * tag
 * .class
 * \#id
+* \[attr\]
 * \[attr=value\]
 * :first-child
 * :last-child
