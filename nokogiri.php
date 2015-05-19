@@ -18,7 +18,7 @@
 class nokogiri implements IteratorAggregate{
 	const
 	regexp = 
-	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\))?)?\s*(?P<rel>>)?/isS"
+	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)(=(?P<value>[^\]]+))?\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\))?)?\s*(?P<rel>>)?/isS"
 	;
 	protected $_source = '';
 	/**
@@ -159,8 +159,12 @@ class nokogiri implements IteratorAggregate{
 				$brackets[] = "@id='".$subs['id']."'";
 			}
 			if (isset($subs['attr']) && '' !== $subs['attr']){
-				$attrValue = isset($subs['value']) && !empty($subs['value'])?$subs['value']:'';
-				$brackets[] = "@".$subs['attr']."='".$attrValue."'";
+				if (!(isset($subs['value']))) {
+					$brackets[] = "@".$subs['attr'];
+				} else {
+					$attrValue = !empty($subs['value'])?$subs['value']:'';
+					$brackets[] = "@".$subs['attr']."='".$attrValue."'";
+				}
 			}
 			if (isset($subs['class']) && '' !== $subs['class']){
 				$brackets[] = 'contains(concat(" ", normalize-space(@class), " "), " '.$subs['class'].' ")';
