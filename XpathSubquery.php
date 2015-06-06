@@ -6,8 +6,7 @@
  */
 class XpathSubquery
 {
-	const
-	regexp = 
+	const REGEXP =
 	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)(=(?P<value>[^\]]+))?\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\))?)?\s*(?P<rel>>)?/isS"
 	;
 	protected static $compiledXpath = array();
@@ -15,12 +14,12 @@ class XpathSubquery
 	public static function get($expression, $rel = false, $compile = true) {
 		if ($compile){
 			$key = $expression.($rel?'>':'*');
-			if (isset(self::$_compiledXpath[$key])){
-				return self::$_compiledXpath[$key];
+			if (isset(self::$compiledXpath[$key])){
+				return self::$compiledXpath[$key];
 			}
 		}
 		$query = '';
-		if (preg_match(self::regexp, $expression, $subs)){
+		if (preg_match(self::REGEXP, $expression, $subs)){
 			$brackets = array();
 			if (isset($subs['id']) && '' !== $subs['id']){
 				$brackets[] = "@id='".$subs['id']."'";
@@ -72,7 +71,7 @@ class XpathSubquery
 			}
 		}
 		if ($compile){
-			self::$_compiledXpath[$key] = $query;
+			self::$compiledXpath[$key] = $query;
 		}
 		return $query;
 	}
