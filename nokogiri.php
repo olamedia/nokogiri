@@ -16,10 +16,6 @@
  * @author olamedia <olamedia@gmail.com>
  */
 class nokogiri implements IteratorAggregate{
-	const
-	regexp = 
-	"/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)(=(?P<value>[^\]]+))?\])?(#(?P<id>[^\s:>#\.]+))?(\.(?P<class>[^\s:>#\.]+))?(:(?P<pseudo>(first|last|nth)-child)(\((?P<expr>[^\)]+)\))?)?\s*(?P<rel>>)?/isS"
-	;
 	protected $_source = '';
 	/**
 	 * @var DOMDocument
@@ -37,21 +33,11 @@ class nokogiri implements IteratorAggregate{
  	 * @var libxmlErrors
  	 */
 	protected $_libxmlErrors = null;
-	protected static $_compiledXpath = array();
 	public function __construct($htmlString = ''){
 		$this->loadHtml($htmlString);
 	}
 	public function getRegexp(){
-		$tag = "(?P<tag>[a-z0-9]+)?";
-		$attr = "(\[(?P<attr>\S+)=(?P<value>[^\]]+)\])?";
-		$id = "(#(?P<id>[^\s:>#\.]+))?";
-		$class = "(\.(?P<class>[^\s:>#\.]+))?";
-		$child = "(first|last|nth)-child";
-		$expr = "(\((?P<expr>[^\)]+)\))";
-		$pseudo = "(:(?P<pseudo>".$child.")".$expr."?)?";
-		$rel = "\s*(?P<rel>>)?";
-		$regexp = "/".$tag.$attr.$id.$class.$pseudo.$rel."/isS";
-		return $regexp;
+		return XpathSubquery::getRegexp();
 	}
 	public static function fromHtml($htmlString){
 		$me = new self();
@@ -146,68 +132,7 @@ class nokogiri implements IteratorAggregate{
 		return $this->_xpath;
 	}
 	public function getXpathSubquery($expression, $rel = false, $compile = true){
-		if ($compile){
-			$key = $expression.($rel?'>':'*');
-			if (isset(self::$_compiledXpath[$key])){
-				return self::$_compiledXpath[$key];
-			}
-		}
-		$query = '';
-		if (preg_match(self::regexp, $expression, $subs)){
-			$brackets = array();
-			if (isset($subs['id']) && '' !== $subs['id']){
-				$brackets[] = "@id='".$subs['id']."'";
-			}
-			if (isset($subs['attr']) && '' !== $subs['attr']){
-				if (!(isset($subs['value']))) {
-					$brackets[] = "@".$subs['attr'];
-				} else {
-					$attrValue = !empty($subs['value'])?$subs['value']:'';
-					$brackets[] = "@".$subs['attr']."='".$attrValue."'";
-				}
-			}
-			if (isset($subs['class']) && '' !== $subs['class']){
-				$brackets[] = 'contains(concat(" ", normalize-space(@class), " "), " '.$subs['class'].' ")';
-			}
-			if (isset($subs['pseudo']) && '' !== $subs['pseudo']){
-				if ('first-child' === $subs['pseudo']){
-					$brackets[] = '1';
-				}elseif ('last-child' === $subs['pseudo']){
-					$brackets[] = 'last()';
-				}elseif ('nth-child' === $subs['pseudo']){
-					if (isset($subs['expr']) && '' !== $subs['expr']){
-						$e = $subs['expr'];
-						if('odd' === $e){
-							$brackets[] = '(position() -1) mod 2 = 0 and position() >= 1';
-						}elseif('even' === $e){
-							$brackets[] = 'position() mod 2 = 0 and position() >= 0';
-						}elseif(preg_match("/^[0-9]+$/", $e)){
-							$brackets[] = 'position() = '.$e;
-						}elseif(preg_match("/^((?P<mul>[0-9]+)n\+)(?P<pos>[0-9]+)$/is", $e, $esubs)){
-							if (isset($esubs['mul'])){
-								$brackets[] = '(position() -'.$esubs['pos'].') mod '.$esubs['mul'].' = 0 and position() >= '.$esubs['pos'].'';
-							}else{
-								$brackets[] = ''.$e.'';
-							}
-						}
-					}
-				}
-			}
-			$query = ($rel?'/':'//').
-				((isset($subs['tag']) && '' !== $subs['tag'])?$subs['tag']:'*').
-				(($c = count($brackets))?
-					($c>1?'[('.implode(') and (', $brackets).')]':'['.implode(' and ', $brackets).']')
-				:'')
-				;
-			$left = trim(substr($expression, strlen($subs[0])));
-			if ('' !== $left){
-				$query .= $this->getXpathSubquery($left, isset($subs['rel'])?'>'===$subs['rel']:false, $compile);
-			}
-		}
-		if ($compile){
-			self::$_compiledXpath[$key] = $query;
-		}
-		return $query;
+		return XpathSubquery::get($expression, $rel = false, $compile);
 	}
 	protected function getElements($xpathQuery){
 		if (strlen($xpathQuery)){
