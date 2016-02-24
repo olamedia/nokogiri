@@ -297,5 +297,19 @@ class nokogiri implements IteratorAggregate{
 	public function toText($glue = ' ', $skipChildren = false){
 		return implode($glue, $this->toTextArray($skipChildren, true));
 	}
+	
+	public function toHtml($node = null)
+	{
+		if ($node === null) {
+		    $node = $this->getDom();
+		}
+		$innerHTML= '';
+		$children = $node->childNodes;
+		foreach ($children as $child) {
+		    $innerHTML .= $child->ownerDocument->saveHTML( $child );
+		}
+		$innerHTML = str_replace(['<root>','</root>'], '', $innerHTML);
+		return $innerHTML;
+	}
 }
 
