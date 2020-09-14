@@ -1,0 +1,107 @@
+<?php
+declare(strict_types=1);
+
+namespace Nokogiri\Dom;
+
+use Nokogiri\Dom\Interfaces\ErrorSuppressorInterface;
+use Nokogiri\Exceptions\MalformedXPathException;
+
+final class Document
+{
+    const LOAD_HTML_OPTIONS = \LIBXML_COMPACT | \LIBXML_HTML_NODEFDTD; // | \LIBXML_HTML_NOIMPLIED
+
+    /**
+     * @var \DOMDocument
+     */
+    private $domDocument;
+
+    private $suppressor;
+
+    private $xpath;
+
+    /**
+     * Document constructor.
+     *
+     * @param ErrorSuppressorInterface $suppressor
+     * @param \DOMDocument | null $domDocument
+     */
+    public function __construct($suppressor, $domDocument = null)
+    {
+        $this->suppressor = $suppressor;
+        if ($domDocument === null) {
+            $this->domDocument = new \DOMDocument('1.0', 'UTF-8');
+            $this->domDocument->preserveWhiteSpace = false;
+        }
+        if ($domDocument !== null) {
+            $this->domDocument = $domDocument;
+        }
+    }
+
+    public function loadHtml($htmlString, $enforceEncoding = null, $autoReload = null)
+    {
+        $this->xpath = null;
+        if ($autoReload === null) {
+            $autoReload = false;
+        }
+        if ($enforceEncoding !== null) {
+            $this->domDocument = new \DOMDocument('1.0', $enforceEncoding);
+            $this->domDocument->preserveWhiteSpace = false;
+        }
+        if ($htmlString === '') {
+            return;
+        }
+        $charsetPrefix = function ($charset) {
+            return '<?xml encoding="' . $charset . '"><meta charset="' . $charset . '" />';
+        };
+        // Loading from here
+        $this->suppressor->start();
+        if ($enforceEncoding !== null) {
+            $this->domDocument->loadHTML($charsetPrefix($enforceEncoding) . $htmlString,
+                    self::LOAD_HTML_OPTIONS);
+        }else {
+            $this->domDocument->loadHTML($htmlString, self::LOAD_HTML_OPTIONS);
+            $detectedEncoding = $this->domDocument->encoding;
+            $correctEncoding = $detectedEncoding === null ? 'UTF-8' : $detectedEncoding;
+            $this->domDocument->encoding = $correctEncoding;
+            // Trying to reload with detected encoding
+            if ($autoReload && $detectedEncoding === null) {
+                $this->domDocument->loadHTML($charsetPrefix($correctEncoding) . $htmlString, self::LOAD_HTML_OPTIONS);
+            }
+        }
+        if ($this->domDocument->childNodes) {
+            foreach ($this->domDocument->childNodes as $item) {
+                if ($item->nodeType == \XML_PI_NODE) { // remove <?xml > header
+                    $this->domDocument->removeChild($item);
+
+                    break;
+                }
+            }
+        }
+        $this->suppressor->finish();
+    }
+
+    public function toDOMDocument()
+    {
+        return $this->domDocument;
+    }
+
+    public function toXml()
+    {
+        return $this->domDocument->saveXML();
+    }
+
+    public function xpathQuery(string $xpathExpression)
+    {
+        if ($this->xpath === null) {
+            $this->xpath = new \DOMXPath($this->domDocument);
+        }
+        if (\strlen($xpathExpression)) {
+            $nodeList = $this->xpath->query($xpathExpression);
+            if ($nodeList === false) {
+                throw new MalformedXPathException('Malformed XPath');
+            }
+
+            return $nodeList;
+        }
+    }
+}
