@@ -1,12 +1,14 @@
 {
     "name": "olamedia/nokogiri",
-    "version": "1.0.1",
+    "version": "2.0.1",
     "type": "library",
-    "version": "2.0.0",
     "description": "HTML Parser",
     "keywords": ["html","parse","parser"],
     "homepage": "http://github.com/olamedia/nokogiri",
     "license": "MIT",
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
     "authors": [
         {
             "name": "olamedia",
