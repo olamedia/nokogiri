@@ -23,5 +23,8 @@
             <directory suffix=".php">src</directory>
             <file>nokogiri.php</file>
         </include>
+        <exclude>
+            <directory suffix=".php">src/Old</directory>
+        </exclude>
     </coverage>
 </phpunit>
