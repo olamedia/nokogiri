@@ -22,6 +22,7 @@
     "autoload": {
         "psr-4": {
             "Nokogiri\\": "src/",
+            "Tests\\Functional\\PHPUnit\\": "tests/functional-phpunit",
             "Tests\\Integration\\PHPUnit\\": "tests/integration-phpunit",
             "Tests\\Unit\\PHPUnit\\": "tests/unit-phpunit"
         },

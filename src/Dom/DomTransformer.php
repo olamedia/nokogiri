@@ -3,76 +3,47 @@ declare(strict_types=1);
 
 namespace Nokogiri\Dom;
 
-use Nokogiri\Iterators\DomTraverser;
-use Nokogiri\Iterators\NodeHandlers;
-
 final class DomTransformer
 {
-    private $traverser;
-
-    public function __construct()
+    public function toArray($node = null, $groupByTags = false, $groupNestedByTags = true)
     {
-        $this->traverser = new DomTraverser();
-    }
-
-    public static function loadHtmlWithCharset($domDocument, $htmlString, $charset)
-    {
-        $domDocument->loadHTML('<meta charset="' . $charset . '" />' . $htmlString, self::LOAD_HTML_OPTIONS);
-    }
-
-    public static function removePiNode($domDocument)
-    {
-        if ($domDocument->childNodes) {
-            foreach ($domDocument->childNodes as $item) {
-                if ($item->nodeType == \XML_PI_NODE) { // remove <?xml > header
-                    $domDocument->removeChild($item);
-
-                    break;
-                }
-            }
-        }
-    }
-
-    public function toArray($node = null, $removeWrapper = false)
-    {
-        $handlers = new NodeHandlers();
-        $handlers->list = $this->traverser;
-        $handlers->node = function ($node) use ($handlers) {
+        if ($node instanceof \DOMNodeList) {
             $result = [];
-            if ($node->nodeType === \XML_PI_NODE) {
-                return '';
-            }
-            if (
-                $node->nodeType === \XML_TEXT_NODE ||
-                $node->nodeType === \XML_COMMENT_NODE ||
-                $node->nodeType === \XML_CDATA_SECTION_NODE
-            ) {
-                return $node->nodeValue;
-            }
-            if ($node->hasAttributes()) {
-                foreach ($node->attributes as $attribute) {
-                    $result[$attribute->nodeName] = $attribute->nodeValue;
+            foreach ($node as $child) {
+                $childResult = $this->toArray($child, $groupNestedByTags, $groupNestedByTags);
+                if ($groupByTags && \array_key_exists($child->nodeName, $result) === false) {
+                    $result[$child->nodeName] = [];
+                }
+                if (\is_array($childResult) === false || \count($childResult)) {
+                    if ($groupByTags) {
+                        $result[$child->nodeName][] = $childResult;
+                    } else {
+                        $result[] = $childResult;
+                    }
                 }
             }
-            if ($node->hasChildNodes()) {
-                foreach ($node->childNodes as $childNode) {
-                    $result[$childNode->nodeName][] = $handlers->list->traverse($childNode, $handlers, false);
-                }
-            }
-//            if ($xnode === null) {
-//                $a = reset($result);
-//                return reset($a); // first child
-//            }
-            return $result;
-        };
-        $result = $handlers->list->traverse($node, $handlers, false);
-        if ($removeWrapper) {
-            $a = reset($result);
 
-            return reset($a);
+            return $result;
+        }
+        if (
+            $node->nodeType === \XML_TEXT_NODE ||
+            $node->nodeType === \XML_COMMENT_NODE ||
+            $node->nodeType === \XML_CDATA_SECTION_NODE
+        ) {
+            return $node->nodeValue;
+        }
+        $nodeResult = [];
+        if ($node->hasAttributes()) {
+            foreach ($node->attributes as $attribute) {
+                $nodeResult[$attribute->nodeName] = $attribute->nodeValue;
+            }
         }
 
-        return $result;
+        $childrenResult = $this->toArray($node->childNodes, $groupNestedByTags, $groupNestedByTags);
+
+        $nodeResult = \array_merge($nodeResult, $childrenResult);
+
+        return $nodeResult;
     }
 
     public function toDOMDocument($fragment)
@@ -105,29 +76,31 @@ final class DomTransformer
         }
     }
 
-    public function toTextArray($node = null, $skipChildren = false, $flatArray = true)
+    public function toTextArray($node = null, $skipChildren = false, $flatArray = true, $depth = 0)
     {
-        $handlers = new NodeHandlers();
-        $handlers->list = $this->traverser;
-        $handlers->node = function ($node) use ($skipChildren, $flatArray, $handlers) {
-            if ($node->nodeType === \XML_TEXT_NODE) {
-                return [$node->nodeValue];
-            }
-            $array = [];
-            if (!$skipChildren) {
-                if ($node->hasChildNodes()) {
-                    $children = $handlers->list->traverse($node->childNodes, $handlers, $flatArray);
-                    if ($flatArray) {
-                        $array = \array_merge($array, $children);
-                    } else {
-                        $array[] = $children;
+        if ($node instanceof \DOMNodeList) {
+            $result = [];
+            foreach ($node as $child) {
+                $childResult = $this->toTextArray($child, $skipChildren, $flatArray, $depth);
+                if ($child->nodeType === \XML_TEXT_NODE || $flatArray) {
+                    $result = \array_merge($result, $childResult);
+                } else {
+                    if (\count($childResult)) {
+                        $result[$child->nodeName][] = $childResult;
                     }
                 }
             }
 
-            return $array;
-        };
+            return $result;
+        }
+        if ($node->nodeType === \XML_TEXT_NODE) {
+            return [$node->nodeValue];
+        }
+        // not a text node, can have children
+        if ($depth > 0 && ($skipChildren || $node->hasChildNodes() === false)) {
+            return [];
+        }
 
-        return $handlers->list->traverse($node, $handlers, $flatArray);
+        return $this->toTextArray($node->childNodes, $skipChildren, $flatArray, $depth + 1);
     }
 }

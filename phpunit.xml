@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+        convertDeprecationsToExceptions="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        >
+    <testsuites>
+        <testsuite name="unit">
+            <directory suffix="Test.php">tests/unit-phpunit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory suffix="Test.php">tests/integration-phpunit</directory>
+        </testsuite>
+    </testsuites>
+    <coverage cacheDirectory="coverage"
+              includeUncoveredFiles="true"
+              processUncoveredFiles="true"
+              pathCoverage="false"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="true">
+        <include>
+            <directory suffix=".php">src</directory>
+            <file>nokogiri.php</file>
+        </include>
+    </coverage>
+</phpunit>

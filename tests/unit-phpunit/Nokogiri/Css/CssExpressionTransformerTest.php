@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- * @coversNothing
+ * @covers \Nokogiri\Css\CssExpressionTransformer
  */
 final class CssExpressionTransformerTest extends TestCase
 {
@@ -25,6 +25,7 @@ final class CssExpressionTransformerTest extends TestCase
     public function queryDataProvider()
     {
         return [
+            ['input' => '*', 'expected' => '//*'],
             ['input' => 'div', 'expected' => '//div'],
             ['input' => '[name]', 'expected' => '//*[@name]'],
             ['input' => '[name=value]', 'expected' => '//*[@name=\'value\']'],
@@ -62,6 +63,7 @@ final class CssExpressionTransformerTest extends TestCase
     }
 
     /**
+     * @covers \Nokogiri\Css\CssExpressionTransformer
      * @covers \Nokogiri\Css\CssExpressionTransformer::__construct
      * @covers \Nokogiri\Css\CssExpressionTransformer::getXPathSubquery
      *

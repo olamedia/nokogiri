@@ -84,7 +84,7 @@ final class NokogiriTest extends TestCase
     }
 
     /**
-     * @see testGet
+     * @see testGetNth
      *
      * @return array[]
      */
@@ -135,7 +135,7 @@ final class NokogiriTest extends TestCase
     /**
      * @covers \nokogiri::__construct
      */
-    public function testConstruct_WithDom()
+    public function testConstructWithDom()
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $saw = new \nokogiri($dom);
@@ -149,7 +149,7 @@ final class NokogiriTest extends TestCase
     /**
      * @covers \nokogiri::__construct
      */
-    public function testConstruct_WithEmptyHtml()
+    public function testConstructWithEmptyHtml()
     {
         $saw = new \nokogiri('');
 
@@ -174,19 +174,9 @@ final class NokogiriTest extends TestCase
     }
 
     /**
-     * @covers \nokogiri::fromHtmlNoCharset()
-     */
-    public function testFromHtmlNoCharset()
-    {
-        $saw = \nokogiri::fromHtmlNoCharset('<div>текст</div>');
-
-        $this->assertStringContainsString('<body><div>текст</div></body>', $saw->toXml());
-    }
-
-    /**
      * @covers \nokogiri::fromHtml()
      */
-    public function testFromHtml_NoMetaUtf8()
+    public function testFromHtmlNoMetaUtf8()
     {
         $saw = \nokogiri::fromHtml('<div>текст</div>');
 
@@ -198,13 +188,23 @@ final class NokogiriTest extends TestCase
     /**
      * @covers \nokogiri::fromHtml()
      */
-    public function testFromHtml_WithUtf8InXmlTag()
+    public function testFromHtmlWithUtf8InXmlTag()
     {
         $saw = \nokogiri::fromHtml('<?xml encoding="UTF-8"?><div>текст</div>');
 
         $result = $saw->toXml();
 
         $this->assertStringContainsString('<body><div>текст</div></body>', $result);
+    }
+
+    /**
+     * @covers \nokogiri::fromHtmlNoCharset()
+     */
+    public function testFromHtmlNoCharset()
+    {
+        $saw = \nokogiri::fromHtmlNoCharset('<div>текст</div>');
+
+        $this->assertStringContainsString('<body><div>текст</div></body>', $saw->toXml());
     }
 
     /**
@@ -233,6 +233,33 @@ final class NokogiriTest extends TestCase
     }
 
     /**
+     * @covers \nokogiri::__invoke()
+     * @covers \nokogiri::get()
+     * @dataProvider getNthDataProvider
+     *
+     * @param mixed $test
+     * @param mixed $css
+     * @param mixed $expected
+     */
+    public function testGetNth($test, $css, $expected)
+    {
+        $htmlString = $test;
+        $oldSaw = new nokogiri();
+        $oldSaw->loadHtml($htmlString);
+        $saw = new \nokogiri();
+        $saw->loadHtml($htmlString);
+        $oldResult = $oldSaw->get($css);
+
+        $result = $saw->get($css);
+        $invokeResult = $saw($css);
+
+        $this->assertInstanceOf(\nokogiri::class, $result);
+        $this->assertSame($expected, \implode('--', \array_map(function ($value) {
+            return $value['#text'][0];
+        }, $result->toArray())));
+    }
+
+    /**
      * @covers \nokogiri::getDom()
      */
     public function testGetDom()
@@ -253,7 +280,7 @@ final class NokogiriTest extends TestCase
     /**
      * @covers \nokogiri::getDom()
      */
-    public function testGetDom_AsDocument()
+    public function testGetDomAsDocument()
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $oldSaw = new nokogiri();
@@ -295,33 +322,6 @@ final class NokogiriTest extends TestCase
         $result = $saw->getIterator();
 
         $this->assertInstanceOf(\Iterator::class, $result);
-    }
-
-    /**
-     * @covers \nokogiri::__invoke()
-     * @covers \nokogiri::get()
-     * @dataProvider getNthDataProvider
-     *
-     * @param mixed $test
-     * @param mixed $css
-     * @param mixed $expected
-     */
-    public function testGet_Nth($test, $css, $expected)
-    {
-        $htmlString = $test;
-        $oldSaw = new nokogiri();
-        $oldSaw->loadHtml($htmlString);
-        $saw = new \nokogiri();
-        $saw->loadHtml($htmlString);
-        $oldResult = $oldSaw->get($css);
-
-        $result = $saw->get($css);
-        $invokeResult = $saw($css);
-
-        $this->assertInstanceOf(\nokogiri::class, $result);
-        $this->assertSame($expected, \implode('--', \array_map(function ($value) {
-            return $value['#text'][0];
-        }, $result->toArray())));
     }
 
     /**

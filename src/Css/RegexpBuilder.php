@@ -27,7 +27,7 @@ final class RegexpBuilder
 
     const REL_SYMBOLS = '(?:[>\\+~]|\s+)';
 
-    const TAG_NAME = '[a-z0-9]+';
+    const TAG_NAME = '[a-z0-9]+|\\*';
 
     public function getRegexp()
     {

@@ -53,7 +53,8 @@ final class DocumentTest extends TestCase
     {
         $suppressorMock = $this->createMock(ErrorSuppressorInterface::class);
         $factory = new DocumentFactory($suppressorMock);
-        $domDocument = new \DOMDocument('1.0', 'UTF-8');
+        $domDocumentMock = $this->prophesize(\DOMDocument::class);
+        $domDocument = $domDocumentMock->reveal();
 
         $document = new Document($suppressorMock, $domDocument);
 

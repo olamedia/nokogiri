@@ -110,7 +110,7 @@ final class Nokogiri
             $node = $this->fragment;
         }
 
-        return $this->domTransformer->toArray($node, $this->hasWrapper);
+        return $this->domTransformer->toArray($node);
     }
 
     public function toDOMDocument()
@@ -126,7 +126,8 @@ final class Nokogiri
 
     public function toText($glue = ' ', $skipChildren = false)
     {
-        return \implode($glue, $this->domTransformer->toTextArray($this->fragment, $skipChildren, true));
+        $textArray = $this->domTransformer->toTextArray($this->fragment, $skipChildren, true);
+        return \implode($glue, $textArray);
     }
 
     public function toTextArray($skipChildren = false, $flatArray = true)

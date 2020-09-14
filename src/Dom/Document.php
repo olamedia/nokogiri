@@ -8,7 +8,7 @@ use Nokogiri\Exceptions\MalformedXPathException;
 
 final class Document
 {
-    const LOAD_HTML_OPTIONS = \LIBXML_COMPACT | \LIBXML_HTML_NODEFDTD; // | \LIBXML_HTML_NOIMPLIED
+    const LOAD_HTML_OPTIONS = \LIBXML_COMPACT | \LIBXML_HTML_NODEFDTD;
 
     /**
      * @var \DOMDocument
@@ -70,7 +70,7 @@ final class Document
         }
         if ($this->domDocument->childNodes) {
             foreach ($this->domDocument->childNodes as $item) {
-                if ($item->nodeType == \XML_PI_NODE) { // remove <?xml > header
+                if ($item->nodeType == \XML_PI_NODE) { // remove <?xml header
                     $this->domDocument->removeChild($item);
 
                     break;
