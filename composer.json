@@ -2,6 +2,7 @@
     "name": "olamedia/nokogiri",
     "version": "1.0.1",
     "type": "library",
+    "version": "2.0.0",
     "description": "HTML Parser",
     "keywords": ["html","parse","parser"],
     "homepage": "http://github.com/olamedia/nokogiri",
@@ -17,9 +18,20 @@
     "require": {
         "php": ">=5.0.0",
         "ext-dom": "*",
-        "ext-libxml": "*"
+        "ext-libxml": ">=2.9.0"
     },
     "autoload": {
+        "psr-4": {
+            "Nokogiri\\": "src/",
+            "Tests\\Functional\\PHPUnit\\": "tests/functional-phpunit",
+            "Tests\\Integration\\PHPUnit\\": "tests/integration-phpunit",
+            "Tests\\Unit\\PHPUnit\\": "tests/unit-phpunit"
+        },
         "classmap": ["nokogiri.php"]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.3",
+        "phpspec/prophecy": "~1.0",
+        "phpspec/prophecy-phpunit": "^2.0"
     }
 }

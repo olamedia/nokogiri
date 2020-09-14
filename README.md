@@ -1,62 +1,88 @@
-HTML parser<br />Парсер HTML
+> Attention: New version can break compatibility, in that case use previous version under the v1.0 branch or tag which supports even php 5.4+
+
+> \nokogiri class is left for compatibility
+
+[In English](README.md) [На русском](README.RU.md)
+
+HTML parser
 ===========
-Данная библиотека - это быстрый парсер html кода, который способен работать с невалидным кодом.<br />
-На вход необходимо подавать документ в кодировке UTF-8 или DomDocument.<br />
-Для поиска элементов используются css-селекторы, которые преобразуются внутри в xpath выражение.<br />
-Полученное xpath выражение кешируется, если в методе get не был выставлен в false второй аргумент (стоит отключать кеширование только в случае динамической генерации css выражений).<br />
-В возвращаемых через ->toArray() массивах находятся аттрибуты, текст под ключом #text и вложенные элементы под числовыми ключами.<br />
-Альтернативные методы: ->toXml() возвращает HTML-строку, ->getDom() возвращает DOMDocument<br />
+This library is a fast HTML parser, which can work with invalid code (errors are ignored).<br />
+Under the hood is used LibXML.<br />
+As the input you can use HTML string in UTF-8 encoding or DOMDocument.<br />
+For the querying elements CSS selectors are used, which are transformed to XPath expressions internally.<br />
 
+Usage
+=====
+### Loading HTML
+> HTML errors are ignored
+* From HTML string `$saw = new \nokogiri($html);` `$saw = \nokogiri::fromHtml($html);`
+* From DOM elements `$saw = new \nokogiri($dom);` `$saw = \nokogiri::fromDom($dom);`
 
-Basic usage<br />Примеры использования
-===================================
+### get($cssSelector)
+$cssSelector elements have the following format:
+`tagName[attribute=value]#elementId.className:pseudoSelector(expression)`
 ```php
-<?php
-$html = gzdecode(file_get_contents('http://habrahabr.ru/'));
+$saw->get('div > a[rel=bookmark]')->toArray();
+```
+### toArray()
+Returns underlying DOM structure as an array.<br />
+Values are attributes, text content under `#text` key and child elements under numeric keys
 
-$saw = new nokogiri($html);
-var_dump($saw->get('a.habracut')->toArray());
-var_dump($saw->get('ul.panel-nav-top li.current')->toArray());
-var_dump($saw->get('#sidebar dl.air-comment a.topic')->toArray());
-var_dump($saw->get('a[rel=bookmark]')->toArray());
+### toXml()
+Returns HTML string
 
+### getDom() toDom()
+Returns DOMDocument.
+Given true as the first argument - can also return DOMNodeList or DOMElement
+
+### Iteration over found elements
+```php
 foreach ($saw->get('#sidebar a.topic') as $link){
     var_dump($link['#text']);
 }
 ```
 
-HTML errors will be ignored.
-Creating from HTML string: `nokogiri::fromHtml($htmlString)` or `new nokogiri($htmlString)`
-Creating from DomDocument: `nokogiri::fromDom($dom)`
-
-Ошибки html игнорируются.
-Создание из строки HTML: nokogiri::fromHtml($htmlString); или new nokogiri($htmlString);
-Создание из DomDocument: nokogiri::fromDom($dom);
-
-
-Implemented css selectors<br />Реализованные селекторы
-=========================
+Implemented selectors
+=====================
 * tag
 * .class
 * \#id
 * \[attr\]
 * \[attr=value\]
+* :root
+* :empty
 * :first-child
 * :last-child
+* :first-of-type
+* :last-of-type
+* :only-of-type
 * :nth-child(a)
 * :nth-child(an+b)
 * :nth-child(even/odd)
 
-
-Requirements<br />Требования
+Requirements
 ============
-DOM
-libxml
-PHP
+* DOM
+* libxml >=2.9.0
+* PHP >= 7.3
 
-Links<br />Ссылки
-============
-Статьи на хабре:
+License
+=======
+MIT
 
-* <a href="http://habrahabr.ru/blogs/php/110112/">Нокогири: парсинг HTML в одну строку</a>
-* <a href="http://habrahabr.ru/blogs/php/114323/">Сравнение библиотек для парсинга</a>
+What's new
+==========
+### 2.0.0
+* Minimal PHP version 7.3
+* Minimal LibXML version 2.9.0
+* Complete refactoring
+* Partially changed behaviour, can break compatibility
+* HTML loading behaviour changed
+* Test coverage
+* Fixed work of nth-child and other selectors
+* Incorrect selectors now throw exceptions
+* New selectors added
+
+### 1.0.0
+* First version, 2011
+* Minimal PHP version 5.4

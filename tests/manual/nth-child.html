@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>nth-child</title>
+    <style>
+        body{
+            display: grid;
+            place-items: center;
+            background: #666;
+            font-family: Arial, sans-serif;
+        }
+        .grid{
+            background: #fff;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .grid>div{
+            background: yellow;
+            padding: 10px;
+            padding: 60px;
+            font-size: 64px;
+            font-weight: bold;
+        }
+        .grid>div:nth-child(6n-8){
+            background: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+        <div>4</div>
+        <div>5</div>
+        <div>6</div>
+        <div>7</div>
+        <div>8</div>
+        <div>9</div>
+    </div>
+</body>
+</html>
