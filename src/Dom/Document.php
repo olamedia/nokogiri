@@ -96,7 +96,11 @@ final class Document
             $this->xpath = new \DOMXPath($this->domDocument);
         }
         if (\strlen($xpathExpression)) {
-            $nodeList = $this->xpath->query($xpathExpression);
+            try {
+                $nodeList = $this->xpath->query($xpathExpression);
+            }catch (\Exception $exception){
+                throw new MalformedXPathException('Malformed XPath',1,$exception);
+            }
             if ($nodeList === false) {
                 throw new MalformedXPathException('Malformed XPath');
             }
