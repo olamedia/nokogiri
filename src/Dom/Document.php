@@ -103,5 +103,6 @@ final class Document
 
             return $nodeList;
         }
+        throw new MalformedXPathException('Empty XPath');
     }
 }

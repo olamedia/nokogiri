@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Tests\Unit\PHPUnit\Nokogiri\Dom;
 
 use Nokogiri\Dom\Document;
-use Nokogiri\Dom\DocumentFactory;
 use Nokogiri\Dom\Interfaces\ErrorSuppressorInterface;
+use Nokogiri\Exceptions\MalformedXPathException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -52,7 +52,6 @@ final class DocumentTest extends TestCase
     public function testToDOMDocument()
     {
         $suppressorMock = $this->createMock(ErrorSuppressorInterface::class);
-        $factory = new DocumentFactory($suppressorMock);
         $domDocumentMock = $this->prophesize(\DOMDocument::class);
         $domDocument = $domDocumentMock->reveal();
 
@@ -67,7 +66,6 @@ final class DocumentTest extends TestCase
     public function testToXml()
     {
         $suppressorMock = $this->createMock(ErrorSuppressorInterface::class);
-        $factory = new DocumentFactory($suppressorMock);
         $domDocument = new \DOMDocument('1.0', 'UTF-8');
         $domDocument->loadHTML('<p>1</p>');
         $document = new Document($suppressorMock, $domDocument);
@@ -75,5 +73,53 @@ final class DocumentTest extends TestCase
         $xmlString = $document->toXml();
 
         $this->assertStringContainsString('<body><p>1</p></body>', $xmlString);
+    }
+
+    /**
+     * @covers \Nokogiri\Dom\Document::xpathQuery
+     */
+    public function testXpathQuery()
+    {
+        $suppressorMock = $this->createMock(ErrorSuppressorInterface::class);
+        $domDocument = new \DOMDocument('1.0', 'UTF-8');
+        $domDocument->loadHTML('<p>1</p>');
+        $document = new Document($suppressorMock, $domDocument);
+
+        $nodeList = $document->xpathQuery('//p');
+
+        $this->assertInstanceOf(\DOMNodeList::class, $nodeList);
+        $this->assertSame('1', $nodeList->item(0)->textContent);
+    }
+
+    /**
+     * @covers \Nokogiri\Dom\Document::xpathQuery
+     */
+    public function testXpathQueryWithEmptyXpathThrowsMalformedXPathException()
+    {
+        $suppressorMock = $this->createMock(ErrorSuppressorInterface::class);
+        $domDocument = new \DOMDocument('1.0', 'UTF-8');
+        $domDocument->loadHTML('<p>1</p>');
+        $document = new Document($suppressorMock, $domDocument);
+
+        $this->expectException(MalformedXPathException::class);
+        $this->expectExceptionMessage('Empty XPath');
+
+        $nodeList = $document->xpathQuery('');
+    }
+
+    /**
+     * @covers \Nokogiri\Dom\Document::xpathQuery
+     */
+    public function testXpathQueryWithMalformedXpathThrowsMalformedXPathException()
+    {
+        $suppressorMock = $this->createMock(ErrorSuppressorInterface::class);
+        $domDocument = new \DOMDocument('1.0', 'UTF-8');
+        $domDocument->loadHTML('<p>1</p>');
+        $document = new Document($suppressorMock, $domDocument);
+
+        $this->expectException(MalformedXPathException::class);
+        $this->expectExceptionMessage('Malformed XPath');
+
+        $nodeList = $document->xpathQuery('=');
     }
 }
