@@ -1,5 +1,6 @@
 {
     "name": "olamedia/nokogiri",
+    "version": "1.0.1",
     "type": "library",
     "description": "HTML Parser",
     "keywords": ["html","parse","parser"],
