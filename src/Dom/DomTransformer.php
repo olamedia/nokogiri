@@ -56,9 +56,10 @@ final class DomTransformer
         }
         if ($fragment instanceof \DOMNodeList || $fragment instanceof \DOMElement) {
             $document = new \DOMDocument('1.0', 'UTF-8');
-            $root = $document->createElement('root');
-            $document->appendChild($root);
+            $root = null;
             if ($fragment instanceof \DOMNodeList) {
+                $root = $document->createElement('root');
+                $document->appendChild($root);
                 foreach ($fragment as $domElement) {
                     $domNode = $document->importNode($domElement, true);
                     $root->appendChild($domNode);
@@ -66,7 +67,8 @@ final class DomTransformer
             }
             if ($fragment instanceof \DOMElement) {
                 $domNode = $document->importNode($fragment, true);
-                $root->appendChild($domNode);
+                $root = $domNode;
+                $document->appendChild($domNode);
             }
 
             return [
@@ -74,6 +76,8 @@ final class DomTransformer
                 'root' => $root
             ];
         }
+
+        throw new \InvalidArgumentException('Invalid fragment given. Should be instance of DOMDocument | DOMNodeList | DOMElement.');
     }
 
     public function toTextArray($node = null, $skipChildren = false, $flatArray = true, $depth = 0)

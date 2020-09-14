@@ -51,6 +51,71 @@ final class DomTransformerTest extends TestCase
     }
 
     /**
+     * @covers \Nokogiri\Dom\DomTransformer::toDOMDocument
+     */
+    public function testToDOMDocumentWithDocument()
+    {
+        $transformer = new DomTransformer();
+        $document = new \DOMDocument('1.0', 'UTF-8');
+
+        $result = $transformer->toDOMDocument($document);
+
+        $this->assertSame(['document' => $document, 'root' => $document], $result);
+    }
+
+    /**
+     * @covers \Nokogiri\Dom\DomTransformer::toDOMDocument
+     */
+    public function testToDOMDocumentThrowsInvalidArgumentException()
+    {
+        $transformer = new DomTransformer();
+        $document = new \DOMDocument('1.0', 'UTF-8');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid fragment given. Should be instance of DOMDocument | DOMNodeList | DOMElement.');
+
+        $result = $transformer->toDOMDocument(42);
+    }
+
+    /**
+     * @covers \Nokogiri\Dom\DomTransformer::toDOMDocument
+     */
+    public function testToDOMDocumentWithElement()
+    {
+        $transformer = new DomTransformer();
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $document->loadHTML('test');
+        $fragment = $document->documentElement->firstChild; // html>body
+
+        $result = $transformer->toDOMDocument($fragment);
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('document', $result);
+        $this->assertInstanceOf(\DOMDocument::class, $result['document']);
+        $this->assertArrayHasKey('root', $result);
+        $this->assertSame('<body><p>test</p></body>', $result['document']->saveXML($result['root']));
+    }
+
+    /**
+     * @covers \Nokogiri\Dom\DomTransformer::toDOMDocument
+     */
+    public function testToDOMDocumentWithNodeList()
+    {
+        $transformer = new DomTransformer();
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $document->loadHTML('test');
+        $fragment = $document->documentElement->childNodes; // html>body
+
+        $result = $transformer->toDOMDocument($fragment);
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('document', $result);
+        $this->assertInstanceOf(\DOMDocument::class, $result['document']);
+        $this->assertArrayHasKey('root', $result);
+        $this->assertSame('<root><body><p>test</p></body></root>', $result['document']->saveXML($result['root']));
+    }
+
+    /**
      * @covers \Nokogiri\Dom\DomTransformer::toTextArray
      *
      * @dataProvider toTextArrayDataProvider
@@ -134,8 +199,13 @@ final class DomTransformerTest extends TestCase
     {
         return [
             [
-                'input' => '<i>1</i><span class="c2">2<span class="ce"></span></span><i>3</i><span>4</span><i>5</i>',
+                'input' => '<script>script_content</script><i>1</i><span class="c2">2<span class="ce"></span></span><i>3</i><span>4</span><i>5</i>',
                 'expected' => [
+                    'head' => [
+                        [
+                            'script' => [['#cdata-section' => ['script_content']]]
+                        ]
+                    ],
                     'body' => [
                         [
                             'i' => [['#text' => ['1']], ['#text' => ['3']], ['#text' => ['5']]],
@@ -154,8 +224,11 @@ final class DomTransformerTest extends TestCase
     {
         return [
             [
-                'input' => '<i>1</i><span class="c2">2<span class="ce"></span></span><i>3</i><span>4</span><i>5</i>',
+                'input' => '<script>script_content</script><i>1</i><span class="c2">2<span class="ce"></span></span><i>3</i><span>4</span><i>5</i>',
                 'expected' => [
+                    [
+                        ['script_content']
+                    ],
                     [
                         ['1'],
                         ['class' => 'c2', '2', ['class' => 'ce']],
