@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /*
- * Copyright (c) 2011-2020 olamedia <olamedia@gmail.com>
+ * Copyright (c) 2011 olamedia <olamedia@gmail.com>
  *
  * This source code is release under the MIT License.
  *

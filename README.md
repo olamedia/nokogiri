@@ -84,5 +84,5 @@ What's new
 * New selectors added
 
 ### 1.0.0
-* First version, 2012
+* First version, 2011
 * Minimal PHP version 5.4
