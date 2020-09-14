@@ -38,11 +38,10 @@ final class DocumentTest extends TestCase
         $domDocumentMock = $this->prophesize(\DOMDocument::class);
         $document = new Document($suppressorMock->reveal(), $domDocumentMock->reveal());
         $domDocumentMock->loadHTML('<p>1</p>', 65540)->shouldBeCalled();
+        $suppressorMock->start()->shouldBeCalled();
+        $suppressorMock->finish()->shouldBeCalled();
 
         $document->loadHtml('<p>1</p>');
-
-        $suppressorMock->start()->shouldHaveBeenCalled();
-        $suppressorMock->finish()->shouldHaveBeenCalled();
     }
 
     /**
