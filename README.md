@@ -2,7 +2,7 @@
 
 > \nokogiri class is left for compatibility
 
-(На русском)[README.RU.md]
+[In English](README.md) [На русском](README.RU.md)
 
 HTML parser
 ===========

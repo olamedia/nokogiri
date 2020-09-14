@@ -4,6 +4,8 @@
 
 > \nokogiri class is left for compatibility
 
+[In English](README.md) [На русском](README.RU.md)
+
 Парсер HTML
 ===========
 Данная библиотека - это быстрый парсер html кода, который способен работать с невалидным кодом.<br />
