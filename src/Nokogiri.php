@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Nokogiri;
 
@@ -127,6 +126,7 @@ final class Nokogiri
     public function toText($glue = ' ', $skipChildren = false)
     {
         $textArray = $this->domTransformer->toTextArray($this->fragment, $skipChildren, true);
+
         return \implode($glue, $textArray);
     }
 

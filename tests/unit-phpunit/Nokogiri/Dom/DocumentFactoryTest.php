@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Tests\Unit\PHPUnit\Nokogiri\Dom;
 
@@ -39,10 +38,9 @@ final class DocumentFactoryTest extends TestCase
 
         $document = $factory->createFromHtmlString($html);
 
-        $this->assertStringContainsString(\mb_convert_encoding('<p>тест</p>', 'CP1251', 'UTF-8'), $document->toXml());
+        $this->assertContains(\mb_convert_encoding('<p>тест</p>', 'CP1251', 'UTF-8'), $document->toXml());
         $this->assertSame('cp1251', $document->toDOMDocument()->encoding);
     }
-
 
     /**
      * @covers \Nokogiri\Dom\DocumentFactory::createFromHtmlString
@@ -54,6 +52,6 @@ final class DocumentFactoryTest extends TestCase
 
         $document = $factory->createFromHtmlString('<p>тест</p>', true);
 
-        $this->assertStringContainsString('<p>тест</p>', $document->toXml());
+        $this->assertContains('<p>тест</p>', $document->toXml());
     }
 }

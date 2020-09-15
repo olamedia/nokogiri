@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /*
  * Copyright (c) 2011 olamedia <olamedia@gmail.com>

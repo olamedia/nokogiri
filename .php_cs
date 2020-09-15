@@ -10,7 +10,7 @@ return PhpCsFixer\Config::create()
         'psr4' => true,
         'strict_param' => false,
         'array_syntax' => ['syntax' => 'short'],
-        'declare_strict_types' => true,
+        'declare_strict_types' => false,
         'yoda_style' => [  // Revert Yoda style
             'equal' => false,
             'identical' => false

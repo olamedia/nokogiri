@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Tests\Integration\PHPUnit;
 
@@ -174,6 +173,16 @@ final class NokogiriTest extends TestCase
     }
 
     /**
+     * @covers \nokogiri::fromHtmlNoCharset()
+     */
+    public function testFromHtmlNoCharset()
+    {
+        $saw = \nokogiri::fromHtmlNoCharset('<div>текст</div>');
+
+        $this->assertContains('<body><div>текст</div></body>', $saw->toXml());
+    }
+
+    /**
      * @covers \nokogiri::fromHtml()
      */
     public function testFromHtmlNoMetaUtf8()
@@ -182,7 +191,7 @@ final class NokogiriTest extends TestCase
 
         $result = $saw->toXml();
 
-        $this->assertStringContainsString('<body><div>текст</div></body>', $result);
+        $this->assertContains('<body><div>текст</div></body>', $result);
     }
 
     /**
@@ -194,17 +203,7 @@ final class NokogiriTest extends TestCase
 
         $result = $saw->toXml();
 
-        $this->assertStringContainsString('<body><div>текст</div></body>', $result);
-    }
-
-    /**
-     * @covers \nokogiri::fromHtmlNoCharset()
-     */
-    public function testFromHtmlNoCharset()
-    {
-        $saw = \nokogiri::fromHtmlNoCharset('<div>текст</div>');
-
-        $this->assertStringContainsString('<body><div>текст</div></body>', $saw->toXml());
+        $this->assertContains('<body><div>текст</div></body>', $result);
     }
 
     /**
@@ -230,33 +229,6 @@ final class NokogiriTest extends TestCase
 
         $this->assertInstanceOf(\nokogiri::class, $result);
         $this->assertSame($expected, $result->toArray());
-    }
-
-    /**
-     * @covers \nokogiri::__invoke()
-     * @covers \nokogiri::get()
-     * @dataProvider getNthDataProvider
-     *
-     * @param mixed $test
-     * @param mixed $css
-     * @param mixed $expected
-     */
-    public function testGetNth($test, $css, $expected)
-    {
-        $htmlString = $test;
-        $oldSaw = new nokogiri();
-        $oldSaw->loadHtml($htmlString);
-        $saw = new \nokogiri();
-        $saw->loadHtml($htmlString);
-        $oldResult = $oldSaw->get($css);
-
-        $result = $saw->get($css);
-        $invokeResult = $saw($css);
-
-        $this->assertInstanceOf(\nokogiri::class, $result);
-        $this->assertSame($expected, \implode('--', \array_map(function ($value) {
-            return $value['#text'][0];
-        }, $result->toArray())));
     }
 
     /**
@@ -304,7 +276,7 @@ final class NokogiriTest extends TestCase
 
         $result = $saw->getErrors();
 
-        $this->assertIsArray($result);
+        $this->assertTrue(\is_array($result));
         $this->assertArrayHasKey(0, $result);
         $this->assertInstanceOf(\LibXMLError::class, $result[0]);
         $this->assertSame('Unexpected end tag : broken', \trim($result[0]->message));
@@ -322,6 +294,33 @@ final class NokogiriTest extends TestCase
         $result = $saw->getIterator();
 
         $this->assertInstanceOf(\Iterator::class, $result);
+    }
+
+    /**
+     * @covers \nokogiri::__invoke()
+     * @covers \nokogiri::get()
+     * @dataProvider getNthDataProvider
+     *
+     * @param mixed $test
+     * @param mixed $css
+     * @param mixed $expected
+     */
+    public function testGetNth($test, $css, $expected)
+    {
+        $htmlString = $test;
+        $oldSaw = new nokogiri();
+        $oldSaw->loadHtml($htmlString);
+        $saw = new \nokogiri();
+        $saw->loadHtml($htmlString);
+        $oldResult = $oldSaw->get($css);
+
+        $result = $saw->get($css);
+        $invokeResult = $saw($css);
+
+        $this->assertInstanceOf(\nokogiri::class, $result);
+        $this->assertSame($expected, \implode('--', \array_map(function ($value) {
+            return $value['#text'][0];
+        }, $result->toArray())));
     }
 
     /**
@@ -378,7 +377,7 @@ final class NokogiriTest extends TestCase
 
         $saw->loadHtmlNoCharset('<div>текст</div>');
 
-        $this->assertStringContainsString('<body><div>текст</div></body>', $saw->toXml());
+        $this->assertContains('<body><div>текст</div></body>', $saw->toXml());
     }
 
     /**

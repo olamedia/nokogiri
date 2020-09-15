@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Nokogiri\Dom;
 
@@ -8,8 +7,6 @@ use Nokogiri\Exceptions\MalformedXPathException;
 
 final class Document
 {
-    const LOAD_HTML_OPTIONS = \LIBXML_COMPACT | \LIBXML_HTML_NODEFDTD;
-
     /**
      * @var \DOMDocument
      */
@@ -57,23 +54,25 @@ final class Document
         $this->suppressor->start();
         if ($enforceEncoding !== null) {
             $this->domDocument->loadHTML($charsetPrefix($enforceEncoding) . $htmlString,
-                    self::LOAD_HTML_OPTIONS);
-        }else {
-            $this->domDocument->loadHTML($htmlString, self::LOAD_HTML_OPTIONS);
+                \LIBXML_COMPACT | \LIBXML_HTML_NODEFDTD);
+        } else {
+            $this->domDocument->loadHTML($htmlString, \LIBXML_COMPACT | \LIBXML_HTML_NODEFDTD);
             $detectedEncoding = null;
             $invalidState = false;
+
             try {
                 $detectedEncoding = $this->domDocument->encoding;
-            }catch (\Exception $exception){
+            } catch (\Exception $exception) {
                 // silently ignore
                 $this->suppressor->finish();
+
                 return;
             }
             $correctEncoding = $detectedEncoding === null ? 'UTF-8' : $detectedEncoding;
             $this->domDocument->encoding = $correctEncoding;
             // Trying to reload with detected encoding
             if ($autoReload && $detectedEncoding === null) {
-                $this->domDocument->loadHTML($charsetPrefix($correctEncoding) . $htmlString, self::LOAD_HTML_OPTIONS);
+                $this->domDocument->loadHTML($charsetPrefix($correctEncoding) . $htmlString, \LIBXML_COMPACT | \LIBXML_HTML_NODEFDTD);
             }
         }
         if ($this->domDocument->childNodes) {
@@ -98,7 +97,7 @@ final class Document
         return $this->domDocument->saveXML();
     }
 
-    public function xpathQuery(string $xpathExpression)
+    public function xpathQuery($xpathExpression)
     {
         if ($this->xpath === null) {
             $this->xpath = new \DOMXPath($this->domDocument);
@@ -106,8 +105,8 @@ final class Document
         if (\strlen($xpathExpression)) {
             try {
                 $nodeList = $this->xpath->query($xpathExpression);
-            }catch (\Exception $exception){
-                throw new MalformedXPathException('Malformed XPath',1,$exception);
+            } catch (\Exception $exception) {
+                throw new MalformedXPathException('Malformed XPath', 1, $exception);
             }
             if ($nodeList === false) {
                 throw new MalformedXPathException('Malformed XPath');
@@ -115,6 +114,7 @@ final class Document
 
             return $nodeList;
         }
+
         throw new MalformedXPathException('Empty XPath');
     }
 }

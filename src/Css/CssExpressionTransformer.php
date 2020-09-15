@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Nokogiri\Css;
 
@@ -34,7 +33,7 @@ final class CssExpressionTransformer
      * @param $expression
      * @param false $rel
      */
-    public function getXPathSubquery($expression, $rel = false): string
+    public function getXPathSubquery($expression, $rel = false)
     {
         $queryStart = '//';
         $nextElementRel = false;

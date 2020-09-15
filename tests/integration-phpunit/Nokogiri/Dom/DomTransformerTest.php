@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Tests\Integration\PHPUnit\Nokogiri\Dom;
 
@@ -53,19 +52,6 @@ final class DomTransformerTest extends TestCase
     /**
      * @covers \Nokogiri\Dom\DomTransformer::toDOMDocument
      */
-    public function testToDOMDocumentWithDocument()
-    {
-        $transformer = new DomTransformer();
-        $document = new \DOMDocument('1.0', 'UTF-8');
-
-        $result = $transformer->toDOMDocument($document);
-
-        $this->assertSame(['document' => $document, 'root' => $document], $result);
-    }
-
-    /**
-     * @covers \Nokogiri\Dom\DomTransformer::toDOMDocument
-     */
     public function testToDOMDocumentThrowsInvalidArgumentException()
     {
         $transformer = new DomTransformer();
@@ -80,6 +66,19 @@ final class DomTransformerTest extends TestCase
     /**
      * @covers \Nokogiri\Dom\DomTransformer::toDOMDocument
      */
+    public function testToDOMDocumentWithDocument()
+    {
+        $transformer = new DomTransformer();
+        $document = new \DOMDocument('1.0', 'UTF-8');
+
+        $result = $transformer->toDOMDocument($document);
+
+        $this->assertSame(['document' => $document, 'root' => $document], $result);
+    }
+
+    /**
+     * @covers \Nokogiri\Dom\DomTransformer::toDOMDocument
+     */
     public function testToDOMDocumentWithElement()
     {
         $transformer = new DomTransformer();
@@ -89,7 +88,7 @@ final class DomTransformerTest extends TestCase
 
         $result = $transformer->toDOMDocument($fragment);
 
-        $this->assertIsArray($result);
+        $this->assertTrue(\is_array($result));
         $this->assertArrayHasKey('document', $result);
         $this->assertInstanceOf(\DOMDocument::class, $result['document']);
         $this->assertArrayHasKey('root', $result);
@@ -108,7 +107,7 @@ final class DomTransformerTest extends TestCase
 
         $result = $transformer->toDOMDocument($fragment);
 
-        $this->assertIsArray($result);
+        $this->assertTrue(\is_array($result));
         $this->assertArrayHasKey('document', $result);
         $this->assertInstanceOf(\DOMDocument::class, $result['document']);
         $this->assertArrayHasKey('root', $result);

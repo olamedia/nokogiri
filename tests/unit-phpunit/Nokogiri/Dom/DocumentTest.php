@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Tests\Unit\PHPUnit\Nokogiri\Dom;
 
@@ -15,7 +14,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
  */
 final class DocumentTest extends TestCase
 {
-    use ProphecyTrait;
 
     /**
      * @covers \Nokogiri\Dom\Document::__construct
@@ -71,7 +69,7 @@ final class DocumentTest extends TestCase
 
         $xmlString = $document->toXml();
 
-        $this->assertStringContainsString('<body><p>1</p></body>', $xmlString);
+        $this->assertContains('<body><p>1</p></body>', $xmlString);
     }
 
     /**

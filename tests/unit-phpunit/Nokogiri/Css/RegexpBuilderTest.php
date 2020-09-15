@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Tests\Unit\PHPUnit\Nokogiri\Css;
 
@@ -94,7 +93,7 @@ final class RegexpBuilderTest extends TestCase
 
         $result = $builder->match($input);
 
-        $this->assertIsArray($result);
+        $this->assertTrue(\is_array($result));
         foreach ($expected as $key => $value) {
             $this->assertArrayHasKey($key, $result);
             $this->assertSame($value, $result[$key]);
@@ -115,7 +114,7 @@ final class RegexpBuilderTest extends TestCase
 
         $result = $builder->match($input);
 
-        $this->assertIsArray($result);
+        $this->assertTrue(\is_array($result));
         foreach ($expected as $key => $value) {
             $this->assertArrayHasKey($key, $result);
             $this->assertSame($value, $result[$key]);
