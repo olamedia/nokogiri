@@ -60,6 +60,7 @@ final class Document
                     self::LOAD_HTML_OPTIONS);
         }else {
             $this->domDocument->loadHTML($htmlString, self::LOAD_HTML_OPTIONS);
+            $detectedEncoding = null;
             try {
                 $detectedEncoding = $this->domDocument->encoding;
             }catch (\Exception $exception){
