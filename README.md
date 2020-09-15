@@ -1,3 +1,5 @@
+![PHP Composer](https://github.com/olamedia/nokogiri/workflows/PHP%20Composer/badge.svg?branch=master)
+
 > Attention: New version can break compatibility, in that case use previous version under the v1.0 branch or tag which supports even php 5.4+
 
 > \nokogiri class is left for compatibility
