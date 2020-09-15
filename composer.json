@@ -20,7 +20,7 @@
     "require": {
         "php": ">=5.0.0",
         "ext-dom": "*",
-        "ext-libxml": ">=2.9.0"
+        "ext-libxml": "*"
     },
     "autoload": {
         "psr-4": {
