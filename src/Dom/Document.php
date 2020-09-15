@@ -66,6 +66,7 @@ final class Document
                 $detectedEncoding = $this->domDocument->encoding;
             }catch (\Exception $exception){
                 // silently ignore
+                $this->suppressor->finish();
                 return;
             }
             $correctEncoding = $detectedEncoding === null ? 'UTF-8' : $detectedEncoding;
