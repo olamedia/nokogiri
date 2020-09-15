@@ -61,13 +61,17 @@ final class Document
         }else {
             $this->domDocument->loadHTML($htmlString, self::LOAD_HTML_OPTIONS);
             $detectedEncoding = null;
+            $invalidState = false;
             try {
                 $detectedEncoding = $this->domDocument->encoding;
             }catch (\Exception $exception){
                 // silently ignore
+                $invalidState = true;
             }
             $correctEncoding = $detectedEncoding === null ? 'UTF-8' : $detectedEncoding;
-            $this->domDocument->encoding = $correctEncoding;
+            if (!$invalidState) {
+                $this->domDocument->encoding = $correctEncoding;
+            }
             // Trying to reload with detected encoding
             if ($autoReload && $detectedEncoding === null) {
                 $this->domDocument->loadHTML($charsetPrefix($correctEncoding) . $htmlString, self::LOAD_HTML_OPTIONS);
