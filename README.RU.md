@@ -4,8 +4,6 @@
 
 > Класс \nokogiri оставлен для совместимости
 
-> \nokogiri class is left for compatibility
-
 [In English](README.md) [На русском](README.RU.md)
 
 Парсер HTML
