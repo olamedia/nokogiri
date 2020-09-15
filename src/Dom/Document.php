@@ -66,12 +66,10 @@ final class Document
                 $detectedEncoding = $this->domDocument->encoding;
             }catch (\Exception $exception){
                 // silently ignore
-                $invalidState = true;
+                return;
             }
             $correctEncoding = $detectedEncoding === null ? 'UTF-8' : $detectedEncoding;
-            if (!$invalidState) {
-                $this->domDocument->encoding = $correctEncoding;
-            }
+            $this->domDocument->encoding = $correctEncoding;
             // Trying to reload with detected encoding
             if ($autoReload && $detectedEncoding === null) {
                 $this->domDocument->loadHTML($charsetPrefix($correctEncoding) . $htmlString, self::LOAD_HTML_OPTIONS);
